@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest
+    package="com.lyft.android.scissorssample"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+  <application
+      android:name=".App"
+      android:theme="@style/Theme.Scissors"
+      >
+
+    <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        >
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity
+        android:name=".CropResultActivity"
+        android:noHistory="true"
+        />
+
+  </application>
+
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+</manifest>

@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    dexOptions {
+        preDexLibraries = !rootProject.ext.ci
+    }
+}
+
+dependencies {
+    // Test
+    testCompile 'junit:junit:' + rootProject.ext.junitVersion
+    testCompile 'org.mockito:mockito-core:' + rootProject.ext.mockitoVersion
+    testCompile 'org.robolectric:robolectric:' + rootProject.ext.robolectricVersion
+    testCompile 'org.assertj:assertj-core:' + rootProject.ext.assertjVersion
+    // Support Annotations
+    compile 'com.android.support:support-annotations:' + rootProject.ext.supportVersion
+    // Optional dependencies for extensions
+    // Picasso
+    provided 'com.squareup.picasso:picasso:[2.4.0, 2.5.2)'
+    // Glide
+    provided 'com.github.bumptech.glide:glide:[3.5.0, 3.6.1)'
+    provided 'com.android.support:support-v4:' + rootProject.ext.supportVersion
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
