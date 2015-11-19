@@ -1,0 +1,5 @@
+# Picasso
+-dontwarn com.squareup.picasso.**
+
+# Glide
+-dontwarn com.bumptech.glide.**
