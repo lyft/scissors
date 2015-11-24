@@ -73,7 +73,12 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
-
+Contributors
+------------
+- [Helen Lau](https://github.com/hlau-lyft)
+- [Alexey Zakharov](https://github.com/lexer)
+- [Thomas Ezan](https://github.com/thomaslyft)
+- [Join us, work for Lyft](https://www.lyft.com/jobs)
 
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/
  [picasso]: https://github.com/square/picasso
