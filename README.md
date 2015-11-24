@@ -47,6 +47,10 @@ cropView.extensions()
     .into(croppedFile))
 ```
 
+Questions
+----------
+For questions please use github issues. Mark question issue with "question" label.
+
 Download
 --------
 
@@ -75,6 +79,7 @@ License
 
 Contributors
 ------------
+- [Evelio Tarazona] (https://github.com/eveliotc)
 - [Helen Lau](https://github.com/hlau-lyft)
 - [Alexey Zakharov](https://github.com/lexer)
 - [Thomas Ezan](https://github.com/thomaslyft)
