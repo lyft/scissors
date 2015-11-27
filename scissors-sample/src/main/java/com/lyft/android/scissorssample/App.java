@@ -47,5 +47,10 @@ public class App extends Application {
                 .penaltyLog()
                 .penaltyDeath()
                 .build());
+
+        // If using Android-Universal-Image-Loader
+        // Create global configuration and initialize ImageLoader with default config
+        // ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        // ImageLoader.getInstance().init(config);
     }
 }
