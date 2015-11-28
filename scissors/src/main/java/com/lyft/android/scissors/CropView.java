@@ -51,6 +51,7 @@ public class CropView extends ImageView {
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
     private Extensions extensions;
+    private int viewHeight = 0, viewWidth = 0;
 
     public CropView(Context context) {
         super(context);
@@ -64,6 +65,8 @@ public class CropView extends ImageView {
     }
 
     void initCropView(Context context, AttributeSet attrs) {
+        viewHeight = getMeasuredHeight();
+        viewWidth = getMeasuredWidth();
         CropViewConfig config = CropViewConfig.from(context, attrs);
 
         touchManager = new TouchManager(MAX_TOUCH_POINTS, config);
@@ -150,7 +153,9 @@ public class CropView extends ImageView {
         final boolean invalidBitmap = bitmap == null;
         final int bitmapWidth = invalidBitmap ? 0 : bitmap.getWidth();
         final int bitmapHeight = invalidBitmap ? 0 : bitmap.getHeight();
-        touchManager.resetFor(bitmapWidth, bitmapHeight, getWidth(), getHeight());
+        touchManager.resetFor(bitmapWidth, bitmapHeight,
+                viewWidth = getWidth() == 0 ? viewWidth : getWidth(),
+                viewHeight = getHeight() == 0 ? viewHeight : getHeight());
     }
 
     @Override
