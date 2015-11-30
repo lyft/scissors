@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.ViewTreeObserver;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
@@ -67,11 +68,37 @@ class CropViewExtensions {
          * @param model Model used by {@link BitmapLoader} to load desired {@link Bitmap}
          */
         public void load(@Nullable Object model) {
+            if (cropView.getWidth() == 0 && cropView.getHeight() == 0) {
+                // Defer load until layout pass
+                deferLoad(model);
+                return;
+            }
+            performLoad(model);
+        }
+
+        void performLoad(Object model) {
             if (bitmapLoader == null) {
                 bitmapLoader = resolveBitmapLoader(cropView);
             }
-
             bitmapLoader.load(model, cropView);
+        }
+
+        void deferLoad(final Object model) {
+            if (!cropView.getViewTreeObserver().isAlive()) {
+                return;
+            }
+            cropView.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            if (cropView.getViewTreeObserver().isAlive()) {
+                                //noinspection deprecation
+                                cropView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                            }
+                            performLoad(model);
+                        }
+                    }
+            );
         }
     }
 
