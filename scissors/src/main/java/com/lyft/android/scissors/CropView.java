@@ -42,10 +42,13 @@ import java.io.OutputStream;
  */
 public class CropView extends ImageView {
 
+    private static final int BORDER_LENGTH_RATIO = 8;
+    private static final float BORDER_STROKE = 6f;
     private static final int MAX_TOUCH_POINTS = 2;
     private TouchManager touchManager;
 
     private Paint viewportPaint = new Paint();
+    private Paint borderPaint = new Paint();
     private Paint bitmapPaint = new Paint();
 
     private Bitmap bitmap;
@@ -70,6 +73,8 @@ public class CropView extends ImageView {
 
         bitmapPaint.setFilterBitmap(true);
         viewportPaint.setColor(config.getViewportHeaderFooterColor());
+        borderPaint.setColor(config.getDefaultBorderColor());
+        borderPaint.setStrokeWidth(BORDER_STROKE);
     }
 
     @Override
@@ -88,6 +93,18 @@ public class CropView extends ImageView {
         final int remainingHalf = (bottom - viewportHeight) / 2;
         canvas.drawRect(0, 0, viewportWidth, remainingHalf, viewportPaint);
         canvas.drawRect(0, bottom - remainingHalf, viewportWidth, bottom, viewportPaint);
+        // Top left lines
+        canvas.drawLine(0, remainingHalf, viewportWidth / BORDER_LENGTH_RATIO + BORDER_STROKE / 2, remainingHalf, borderPaint);
+        canvas.drawLine(BORDER_STROKE / 2, remainingHalf, BORDER_STROKE / 2, remainingHalf + (viewportHeight / BORDER_LENGTH_RATIO) + BORDER_STROKE / 2, borderPaint);
+        // Top right lines
+        canvas.drawLine(viewportWidth, remainingHalf, viewportWidth - (viewportWidth / BORDER_LENGTH_RATIO) - BORDER_STROKE / 2, remainingHalf, borderPaint);
+        canvas.drawLine(viewportWidth - BORDER_STROKE / 2, remainingHalf, viewportWidth - BORDER_STROKE / 2, remainingHalf + (viewportHeight / BORDER_LENGTH_RATIO), borderPaint);
+        // Bottom left lines
+        canvas.drawLine(0, bottom - remainingHalf, viewportWidth / BORDER_LENGTH_RATIO - (BORDER_STROKE / 2), bottom - remainingHalf, borderPaint);
+        canvas.drawLine(BORDER_STROKE / 2, bottom - remainingHalf, BORDER_STROKE / 2, bottom - remainingHalf - (viewportHeight / BORDER_LENGTH_RATIO), borderPaint);
+        // Bottom right lines
+        canvas.drawLine(viewportWidth, bottom - remainingHalf, viewportWidth - (viewportWidth / BORDER_LENGTH_RATIO), bottom - remainingHalf, borderPaint);
+        canvas.drawLine(viewportWidth - BORDER_STROKE / 2, bottom - remainingHalf, viewportWidth - BORDER_STROKE / 2, bottom - remainingHalf - (viewportHeight / BORDER_LENGTH_RATIO), borderPaint);
     }
 
     private void drawBitmap(Canvas canvas) {
