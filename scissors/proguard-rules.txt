@@ -1,5 +1,7 @@
 # Picasso
 -dontwarn com.squareup.picasso.**
+-keepnames class com.squareup.picasso.Picasso
 
 # Glide
 -dontwarn com.bumptech.glide.**
+-keepnames class com.bumptech.glide.Glide
