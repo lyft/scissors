@@ -77,6 +77,11 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
+Contributing
+------------
+
+Please see `CONTRIBUTING.md`.
+
 Contributors
 ------------
 - [Evelio Tarazona] (https://github.com/eveliotc)
