@@ -3,7 +3,7 @@
 Scissors
 =========================
 
-Fixed viewport image cropping library for Android with built-in support for [Picasso][picasso] or [Glide][glide].
+Fixed viewport image cropping library for Android with built-in support for [Picasso][picasso], [Glide][glide] or [Universal Image Loader][uil].
 
 Usage
 -----
@@ -30,7 +30,7 @@ Extensions
 Scissors comes with handy extensions which help with common tasks like:
 
 #### Loading a Bitmap
-To load a Bitmap automatically with [Picasso][picasso] or [Glide][glide] into `CropView` use as follows:
+To load a Bitmap automatically with [Picasso][picasso], [Glide][glide] or [Universal Image Loader][uil] into `CropView` use as follows:
 
 ```java
 cropView.extensions()
@@ -84,12 +84,10 @@ Please see `CONTRIBUTING.md`.
 
 Contributors
 ------------
-- [Evelio Tarazona] (https://github.com/eveliotc)
-- [Helen Lau](https://github.com/hlau-lyft)
-- [Alexey Zakharov](https://github.com/lexer)
-- [Thomas Ezan](https://github.com/thomaslyft)
+- [See contributors on GitHub](https://github.com/lyft/scissors/graphs/contributors)
 - [Join us, work for Lyft](https://www.lyft.com/jobs)
 
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/
  [picasso]: https://github.com/square/picasso
  [glide]: https://github.com/bumptech/glide
+ [uil]: https://github.com/nostra13/Android-Universal-Image-Loader
