@@ -53,6 +53,13 @@ public class CropResultActivity extends Activity {
         //        .diskCacheStrategy(DiskCacheStrategy.NONE)
         //        .skipMemoryCache(true)
         //        .into(resultView);
+
+        // Or Android-Universal-Image-Loader
+        //DisplayImageOptions options = new DisplayImageOptions.Builder()
+        //        .cacheInMemory(false)
+        //        .cacheOnDisk(false)
+        //        .build();
+        //ImageLoader.getInstance().displayImage("file://" + filePath, resultView, options);
     }
 
     static void startUsing(File croppedPath, Activity activity) {

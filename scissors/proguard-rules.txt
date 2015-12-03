@@ -5,3 +5,7 @@
 # Glide
 -dontwarn com.bumptech.glide.**
 -keepnames class com.bumptech.glide.Glide
+
+# Android-Universal-Image-Loader
+-dontwarn com.nostra13.universalimageloader.core.**
+-keepnames class com.nostra13.universalimageloader.core.ImageLoader
