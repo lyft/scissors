@@ -88,8 +88,8 @@ class TouchManager {
         this.bitmapWidth = bitmapWidth;
         this.bitmapHeight = bitmapHeight;
 
-        horizontalLimit = computeLimit(bitmapWidth, viewportWidth);
-        verticalLimit = computeLimit(bitmapHeight, viewportHeight);
+        horizontalLimit = computeLimit((int) (bitmapWidth * scale), viewportWidth);
+        verticalLimit = computeLimit((int) (bitmapHeight * scale), viewportHeight);
     }
 
     public int getViewportWidth() {
