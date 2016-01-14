@@ -83,13 +83,13 @@ class TouchManager {
 
         imageBounds = new Rect(0, 0, availableWidth / 2, availableHeight / 2);
         setViewport(availableWidth);
-        setMinimumScale();
 
         this.bitmapWidth = bitmapWidth;
         this.bitmapHeight = bitmapHeight;
+        setMinimumScale();
 
-        horizontalLimit = computeLimit(bitmapWidth, viewportWidth);
-        verticalLimit = computeLimit(bitmapHeight, viewportHeight);
+        horizontalLimit = computeLimit((int) (bitmapWidth * minimumScale), viewportWidth);
+        verticalLimit = computeLimit((int) (bitmapHeight * minimumScale), viewportHeight);
     }
 
     public int getViewportWidth() {
@@ -173,10 +173,7 @@ class TouchManager {
     private void setMinimumScale() {
         float imageAspect = (float) bitmapWidth / bitmapHeight;
         float viewportAspect = (float) viewportWidth / viewportHeight;
-
-        if (bitmapWidth < viewportWidth || bitmapHeight < viewportHeight) {
-            minimumScale = 1f;
-        } else if (imageAspect > viewportAspect) {
+        if (imageAspect > viewportAspect) {
             minimumScale = (float) viewportHeight / bitmapHeight;
         } else {
             minimumScale = (float) viewportWidth / bitmapWidth;
