@@ -15,6 +15,7 @@
  */
 package com.lyft.android.scissorssample;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -22,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -40,16 +42,25 @@ import static rx.schedulers.Schedulers.io;
 
 public class MainActivity extends Activity {
 
+    private static final float[] ASPECT_RATIOS = { 0f, 1f, 6f/4f, 16f/9f };
+
+    private static final String[] ASPECT_LABELS = { "\u00D8", "1:1", "6:4", "16:9" };
+
     @Bind(R.id.crop_view)
     CropView cropView;
 
-    @Bind({ R.id.crop_fab, R.id.pick_mini_fab })
+    @Bind({ R.id.crop_fab, R.id.pick_mini_fab, R.id.ratio_fab })
     List<View> buttons;
 
     @Bind(R.id.pick_fab)
     View pickButton;
 
+    @Bind(R.id.ratio_fab)
+    View ratioButton;
+
     CompositeSubscription subscriptions = new CompositeSubscription();
+
+    private int selectedRatio = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +112,23 @@ public class MainActivity extends Activity {
     public void onPickClicked() {
         cropView.extensions()
                 .pickUsing(this, RequestCodes.PICK_IMAGE_FROM_GALLERY);
+    }
+
+    @OnClick(R.id.ratio_fab)
+    public void onRatioClicked() {
+        final float oldRatio = cropView.getImageRatio();
+        selectedRatio = (selectedRatio + 1) % ASPECT_RATIOS.length;
+
+        // Since the animation needs to interpolate to the native
+        // ratio, we need to get that instead of using 0
+        float newRatio = ASPECT_RATIOS[selectedRatio];
+        if (Float.compare(0, newRatio) == 0) {
+            newRatio = cropView.getImageRatio();
+        }
+
+        ObjectAnimator.ofFloat(cropView, "aspectRatio", oldRatio, newRatio).start();
+
+        Toast.makeText(this, ASPECT_LABELS[selectedRatio], Toast.LENGTH_SHORT).show();
     }
 
     @Override

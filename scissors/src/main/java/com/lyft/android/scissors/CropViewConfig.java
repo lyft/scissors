@@ -21,32 +21,41 @@ import android.util.AttributeSet;
 
 class CropViewConfig {
 
-    public static final float DEFAULT_VIEWPORT_HEIGHT_RATIO = 1f;
+    public static final float DEFAULT_VIEWPORT_RATIO = 0f;
     public static final float DEFAULT_MAXIMUM_SCALE = 10f;
     public static final float DEFAULT_MINIMUM_SCALE = 0f;
     public static final int DEFAULT_IMAGE_QUALITY = 100;
-    public static final int DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR = 0xC8000000; // Black with 200 alpha
+    public static final int DEFAULT_VIEWPORT_OVERLAY_PADDING = 0;
+    public static final int DEFAULT_VIEWPORT_OVERLAY_COLOR = 0xC8000000; // Black with 200 alpha
 
-    private float viewportHeightRatio = DEFAULT_VIEWPORT_HEIGHT_RATIO;
+    private float viewportRatio = DEFAULT_VIEWPORT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
     private float minScale = DEFAULT_MINIMUM_SCALE;
-    private int viewportHeaderFooterColor = DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR;
+    private int viewportOverlayPadding = DEFAULT_VIEWPORT_OVERLAY_PADDING;
+    private int viewportOverlayColor = DEFAULT_VIEWPORT_OVERLAY_COLOR;
 
-    public int getViewportHeaderFooterColor() {
-        return viewportHeaderFooterColor;
+    public int getViewportOverlayColor() {
+        return viewportOverlayColor;
     }
 
-    void setViewportHeaderFooterColor(int viewportHeaderFooterColor) {
-        this.viewportHeaderFooterColor = viewportHeaderFooterColor;
+    void setViewportOverlayColor(int viewportOverlayColor) {
+        this.viewportOverlayColor = viewportOverlayColor;
     }
 
-    public float getViewportHeightRatio() {
-        return viewportHeightRatio;
+    public int getViewportOverlayPadding() {
+        return viewportOverlayPadding;
     }
 
-    void setViewportHeightRatio(float viewportHeightRatio) {
-        this.viewportHeightRatio =
-                viewportHeightRatio <= 0 ? DEFAULT_VIEWPORT_HEIGHT_RATIO : viewportHeightRatio;
+    void setViewportOverlayPadding(int viewportOverlayPadding) {
+        this.viewportOverlayPadding = viewportOverlayPadding;
+    }
+
+    public float getViewportRatio() {
+        return viewportRatio;
+    }
+
+    void setViewportRatio(float viewportRatio) {
+        this.viewportRatio = viewportRatio <= 0 ? DEFAULT_VIEWPORT_RATIO : viewportRatio;
     }
 
     public float getMaxScale() {
@@ -76,9 +85,9 @@ class CropViewConfig {
                 attrs,
                 R.styleable.CropView);
 
-        cropViewConfig.setViewportHeightRatio(
-                attributes.getFloat(R.styleable.CropView_cropviewViewportHeightRatio,
-                        CropViewConfig.DEFAULT_VIEWPORT_HEIGHT_RATIO));
+        cropViewConfig.setViewportRatio(
+                attributes.getFloat(R.styleable.CropView_cropviewViewportRatio,
+                        CropViewConfig.DEFAULT_VIEWPORT_RATIO));
 
         cropViewConfig.setMaxScale(
                 attributes.getFloat(R.styleable.CropView_cropviewMaxScale,
@@ -88,9 +97,14 @@ class CropViewConfig {
                 attributes.getFloat(R.styleable.CropView_cropviewMinScale,
                         CropViewConfig.DEFAULT_MINIMUM_SCALE));
 
-        cropViewConfig.setViewportHeaderFooterColor(
-                attributes.getColor(R.styleable.CropView_cropviewViewportHeaderFooterColor,
-                        CropViewConfig.DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR));
+        cropViewConfig.setViewportOverlayColor(
+            attributes.getColor(R.styleable.CropView_cropviewViewportOverlayColor,
+                CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_COLOR));
+
+        cropViewConfig.setViewportOverlayPadding(
+            attributes.getDimensionPixelSize(R.styleable.CropView_cropviewViewportOverlayPadding,
+                CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_PADDING));
+
         attributes.recycle();
 
         return cropViewConfig;

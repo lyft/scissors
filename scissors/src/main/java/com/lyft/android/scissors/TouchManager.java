@@ -32,6 +32,7 @@ class TouchManager {
     private float minimumScale;
     private float maximumScale;
     private Rect imageBounds;
+    private float aspectRatio;
     private int viewportWidth;
     private int viewportHeight;
     private int bitmapWidth;
@@ -40,7 +41,7 @@ class TouchManager {
     private int verticalLimit;
     private int horizontalLimit;
 
-    private float scale = 1.0f;
+    private float scale = -1.0f;
     private TouchPoint position = new TouchPoint();
 
     public TouchManager(final int maxNumberOfTouchPoints, final CropViewConfig cropViewConfig) {
@@ -69,7 +70,10 @@ class TouchManager {
 
         handleDragGesture();
         handlePinchGesture();
-        handleDragOutsideViewport(event);
+
+        if (isUpAction(event.getActionMasked())) {
+            ensureInsideViewport();
+        }
     }
 
     public void applyPositioningAndScale(Matrix matrix) {
@@ -79,17 +83,17 @@ class TouchManager {
     }
 
     public void resetFor(int bitmapWidth, int bitmapHeight, int availableWidth, int availableHeight) {
-        position.set(availableWidth / 2, availableHeight / 2);
-
+        aspectRatio = cropViewConfig.getViewportRatio();
         imageBounds = new Rect(0, 0, availableWidth / 2, availableHeight / 2);
-        setViewport(availableWidth);
-        setMinimumScale();
+        setViewport(bitmapWidth, bitmapHeight, availableWidth, availableHeight);
 
         this.bitmapWidth = bitmapWidth;
         this.bitmapHeight = bitmapHeight;
-
-        horizontalLimit = computeLimit(bitmapWidth, viewportWidth);
-        verticalLimit = computeLimit(bitmapHeight, viewportHeight);
+        if (bitmapWidth > 0 && bitmapHeight > 0) {
+            setMinimumScale();
+            setLimits();
+            ensureInsideViewport();
+        }
     }
 
     public int getViewportWidth() {
@@ -98,6 +102,15 @@ class TouchManager {
 
     public int getViewportHeight() {
         return viewportHeight;
+    }
+
+    public float getAspectRatio() {
+        return aspectRatio;
+    }
+
+    public void setAspectRatio(float ratio) {
+        aspectRatio = ratio;
+        cropViewConfig.setViewportRatio(ratio);
     }
 
     private void handleDragGesture() {
@@ -112,18 +125,17 @@ class TouchManager {
             return;
         }
         updateScale();
-        horizontalLimit = computeLimit((int) (bitmapWidth * scale), viewportWidth);
-        verticalLimit = computeLimit((int) (bitmapHeight * scale), viewportHeight);
+        setLimits();
     }
 
-    @TargetApi(Build.VERSION_CODES.FROYO)
-    private void handleDragOutsideViewport(MotionEvent event) {
-        if (imageBounds == null || !isUpAction(event.getActionMasked())) {
+    private void ensureInsideViewport() {
+        if (imageBounds == null) {
             return;
         }
 
         float newY = position.getY();
         int bottom = imageBounds.bottom;
+
 
         if (bottom - newY >= verticalLimit) {
             newY = bottom - verticalLimit;
@@ -165,23 +177,37 @@ class TouchManager {
         }
     }
 
-    private void setViewport(int w) {
-        viewportWidth = w;
-        viewportHeight = (int) (w * cropViewConfig.getViewportHeightRatio());
+    private void setViewport(int bitmapWidth, int bitmapHeight, int availableWidth, int availableHeight) {
+        final float imageAspect = (float) bitmapWidth / bitmapHeight;
+        final float viewAspect = (float) availableWidth / availableHeight;
+
+        float ratio = cropViewConfig.getViewportRatio();
+        if (Float.compare(0f, ratio) == 0) {
+            // viewport ratio of 0 means match native ratio of bitmap
+            ratio = imageAspect;
+        }
+
+        if (ratio > viewAspect) {
+            // viewport is wider than view
+            viewportWidth = availableWidth - cropViewConfig.getViewportOverlayPadding() * 2;
+            viewportHeight = (int) (viewportWidth * (1 / ratio));
+        } else {
+            // viewport is taller than view
+            viewportHeight = availableHeight - cropViewConfig.getViewportOverlayPadding() * 2;
+            viewportWidth = (int) (viewportHeight * ratio);
+        }
+    }
+
+    private void setLimits() {
+        horizontalLimit = computeLimit((int) (bitmapWidth * scale), viewportWidth);
+        verticalLimit = computeLimit((int) (bitmapHeight * scale), viewportHeight);
     }
 
     private void setMinimumScale() {
-        float imageAspect = (float) bitmapWidth / bitmapHeight;
-        float viewportAspect = (float) viewportWidth / viewportHeight;
-
-        if (bitmapWidth < viewportWidth || bitmapHeight < viewportHeight) {
-            minimumScale = 1f;
-        } else if (imageAspect > viewportAspect) {
-            minimumScale = (float) viewportHeight / bitmapHeight;
-        } else {
-            minimumScale = (float) viewportWidth / bitmapWidth;
-        }
-        scale = minimumScale;
+        final float fw = (float) viewportWidth / bitmapWidth;
+        final float fh = (float) viewportHeight / bitmapHeight;
+        minimumScale = Math.max(fw, fh);
+        scale = Math.max(scale, minimumScale);
     }
 
     private void updateScale() {
@@ -230,8 +256,7 @@ class TouchManager {
                 : vector(previousPoints[indexA], previousPoints[indexB]);
     }
 
-    private static int computeLimit
-            (int bitmapSize, int viewportSize) {
+    private static int computeLimit(int bitmapSize, int viewportSize) {
         return (bitmapSize - viewportSize) / 2;
     }
 
