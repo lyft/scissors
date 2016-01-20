@@ -1,3 +1,5 @@
+[![Android Gems](http://www.android-gems.com/badge/lyft/scissors.svg?branch=master)](http://www.android-gems.com/lib/lyft/scissors)
+
 <img src="art/scissors.png" width="256" align="right" hspace="20" />
 
 Scissors
