@@ -17,6 +17,7 @@ package com.lyft.android.scissors;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 
 class CropViewConfig {
@@ -27,10 +28,32 @@ class CropViewConfig {
     public static final int DEFAULT_IMAGE_QUALITY = 100;
     public static final int DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR = 0xC8000000; // Black with 200 alpha
 
+    public static final int DEFAULT_CROP_BORDER_COLOR = Color.RED;
+    public static final float DEFAULT_VIEWPORT_RATIO = 1f;
+
     private float viewportHeightRatio = DEFAULT_VIEWPORT_HEIGHT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
     private float minScale = DEFAULT_MINIMUM_SCALE;
     private int viewportHeaderFooterColor = DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR;
+    private int cropBorderColor = DEFAULT_CROP_BORDER_COLOR;
+    private float viewportRatio=DEFAULT_VIEWPORT_RATIO;
+
+    public int getCropBorderColor() {
+        return cropBorderColor;
+    }
+
+    void setCropBorderColor(int cropBorderColor) {
+        this.cropBorderColor = cropBorderColor;
+    }
+
+    public float getViewportRatio() {
+        return viewportRatio;
+    }
+
+    void setViewportRatio(float viewportRatio) {
+        this.viewportRatio =
+                viewportRatio <= 0 ? DEFAULT_VIEWPORT_RATIO : viewportRatio;
+    }
 
     public int getViewportHeaderFooterColor() {
         return viewportHeaderFooterColor;
@@ -83,17 +106,14 @@ class CropViewConfig {
                 attributes.getFloat(R.styleable.CropView_cropviewViewportHeightRatio,
                         CropViewConfig.DEFAULT_VIEWPORT_HEIGHT_RATIO));
 
-        cropViewConfig.setMaxScale(
-                attributes.getFloat(R.styleable.CropView_cropviewMaxScale,
-                        CropViewConfig.DEFAULT_MAXIMUM_SCALE));
+        cropViewConfig.setMaxScale(attributes.getFloat(R.styleable.CropView_cropviewMaxScale, CropViewConfig.DEFAULT_MAXIMUM_SCALE));
 
-        cropViewConfig.setMinScale(
-                attributes.getFloat(R.styleable.CropView_cropviewMinScale,
-                        CropViewConfig.DEFAULT_MINIMUM_SCALE));
+        cropViewConfig.setMinScale(attributes.getFloat(R.styleable.CropView_cropviewMinScale, CropViewConfig.DEFAULT_MINIMUM_SCALE));
 
-        cropViewConfig.setViewportHeaderFooterColor(
-                attributes.getColor(R.styleable.CropView_cropviewViewportHeaderFooterColor,
-                        CropViewConfig.DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR));
+        cropViewConfig.setViewportHeaderFooterColor(attributes.getColor(R.styleable.CropView_cropviewViewportHeaderFooterColor, CropViewConfig.DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR));
+
+        cropViewConfig.setCropBorderColor(attributes.getColor(R.styleable.CropView_cropviewBorderColor, CropViewConfig.DEFAULT_CROP_BORDER_COLOR));
+        cropViewConfig.setViewportRatio(attributes.getFloat(R.styleable.CropView_cropviewRatio, CropViewConfig.DEFAULT_VIEWPORT_RATIO));
         attributes.recycle();
 
         return cropViewConfig;

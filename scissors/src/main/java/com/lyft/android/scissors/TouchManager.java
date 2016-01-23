@@ -82,8 +82,8 @@ class TouchManager {
         position.set(availableWidth / 2, availableHeight / 2);
 
         imageBounds = new Rect(0, 0, availableWidth / 2, availableHeight / 2);
-        setViewport(availableWidth);
-        setMinimumScale();
+        setViewport((int) (availableWidth*cropViewConfig.getViewportRatio()));
+        setMinimumScale(availableWidth, availableHeight);
 
         this.bitmapWidth = bitmapWidth;
         this.bitmapHeight = bitmapHeight;
@@ -180,6 +180,20 @@ class TouchManager {
             minimumScale = (float) viewportHeight / bitmapHeight;
         } else {
             minimumScale = (float) viewportWidth / bitmapWidth;
+        }
+        scale = minimumScale;
+    }
+
+    private void setMinimumScale(int availableWidth, int availableHeight) {
+        float imageAspect = (float) bitmapWidth / bitmapHeight;
+        float viewportAspect = (float) availableWidth / availableHeight;
+
+        if (bitmapWidth < availableWidth || bitmapHeight < availableHeight) {
+            minimumScale = 1f;
+        } else if (imageAspect > viewportAspect) {
+            minimumScale = (float) availableHeight / bitmapHeight;
+        } else {
+            minimumScale = (float) availableWidth / bitmapWidth;
         }
         scale = minimumScale;
     }
