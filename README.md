@@ -55,7 +55,7 @@ Download
 --------
 
 ```groovy
-compile 'com.lyft:scissors:1.0.1'
+compile 'com.lyft:scissors:1.0.2'
 ```
 
 Snapshots of development version are available in [Sonatype's `snapshots` repository][snap].
