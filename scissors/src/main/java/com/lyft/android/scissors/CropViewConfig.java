@@ -26,6 +26,7 @@ class CropViewConfig {
     public static final float DEFAULT_MINIMUM_SCALE = 0f;
     public static final int DEFAULT_IMAGE_QUALITY = 100;
     public static final int DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR = 0xC8000000; // Black with 200 alpha
+    public static final int DEFAULT_BORDER_COLOR = 0xffffffff;
 
     private float viewportHeightRatio = DEFAULT_VIEWPORT_HEIGHT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
@@ -35,6 +36,11 @@ class CropViewConfig {
     public int getViewportHeaderFooterColor() {
         return viewportHeaderFooterColor;
     }
+
+    public int getDefaultBorderColor() {
+        return DEFAULT_BORDER_COLOR;
+    }
+
 
     void setViewportHeaderFooterColor(int viewportHeaderFooterColor) {
         this.viewportHeaderFooterColor =
