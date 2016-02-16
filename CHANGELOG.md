@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.0.3 *(2015-02-15)*
+----------------------------
+
+Fix misplaced sample resources (#28 Thanks @rharter!)
+
 Version 1.0.2 *(2015-02-15)*
 ----------------------------
 
