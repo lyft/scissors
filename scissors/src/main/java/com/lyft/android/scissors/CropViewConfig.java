@@ -37,10 +37,7 @@ class CropViewConfig {
     }
 
     void setViewportHeaderFooterColor(int viewportHeaderFooterColor) {
-        this.viewportHeaderFooterColor =
-                viewportHeaderFooterColor <= 0
-                        ? DEFAULT_VIEWPORT_HEADER_FOOTER_COLOR
-                        : viewportHeaderFooterColor;
+        this.viewportHeaderFooterColor = viewportHeaderFooterColor;
     }
 
     public float getViewportHeightRatio() {
