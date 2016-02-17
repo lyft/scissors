@@ -43,10 +43,12 @@ import java.io.OutputStream;
 public class CropView extends ImageView {
 
     private static final int MAX_TOUCH_POINTS = 2;
+    private static final float LINE_WIDTH = 4f;
     private TouchManager touchManager;
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
+    private Paint mLinePaint=new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
@@ -70,6 +72,9 @@ public class CropView extends ImageView {
 
         bitmapPaint.setFilterBitmap(true);
         viewportPaint.setColor(config.getViewportHeaderFooterColor());
+
+        mLinePaint.setColor(config.getCropBorderColor());
+        mLinePaint.setStrokeWidth(LINE_WIDTH);
     }
 
     @Override
@@ -86,8 +91,17 @@ public class CropView extends ImageView {
         final int viewportWidth = touchManager.getViewportWidth();
         final int viewportHeight = touchManager.getViewportHeight();
         final int remainingHalf = (bottom - viewportHeight) / 2;
-        canvas.drawRect(0, 0, viewportWidth, remainingHalf, viewportPaint);
-        canvas.drawRect(0, bottom - remainingHalf, viewportWidth, bottom, viewportPaint);
+        canvas.drawRect(0, 0, getWidth(), remainingHalf, viewportPaint);
+        canvas.drawRect(0, bottom - remainingHalf, getWidth(), bottom, viewportPaint);
+
+
+        int remainingWidthHalf= ((getWidth()-viewportWidth)/2);
+        canvas.drawRect(0, remainingHalf, remainingWidthHalf, bottom - remainingHalf, viewportPaint);
+        canvas.drawRect(getWidth()-remainingWidthHalf, remainingHalf, getWidth(), bottom - remainingHalf, viewportPaint);
+        canvas.drawLine(remainingWidthHalf, remainingHalf, getWidth() - remainingWidthHalf, remainingHalf, mLinePaint);
+        canvas.drawLine(remainingWidthHalf + LINE_WIDTH / 2, remainingHalf, remainingWidthHalf + LINE_WIDTH / 2, bottom - remainingHalf, mLinePaint);
+        canvas.drawLine(getWidth() - remainingWidthHalf - LINE_WIDTH / 2, remainingHalf, getWidth() - remainingWidthHalf - LINE_WIDTH / 2, bottom - remainingHalf, mLinePaint);
+        canvas.drawLine(remainingWidthHalf, bottom - remainingHalf, getWidth() - remainingWidthHalf, bottom - remainingHalf, mLinePaint);
     }
 
     private void drawBitmap(Canvas canvas) {
@@ -184,7 +198,8 @@ public class CropView extends ImageView {
 
         Canvas canvas = new Canvas(dst);
         final int remainingHalf = (getBottom() - viewportHeight) / 2;
-        canvas.translate(0, -remainingHalf);
+        int remainingWidthHalf=((getWidth()-viewportWidth)/2);
+        canvas.translate(-remainingWidthHalf, -remainingHalf);
 
         drawBitmap(canvas);
 
@@ -209,6 +224,14 @@ public class CropView extends ImageView {
      */
     public int getViewportHeight() {
         return touchManager.getViewportHeight();
+    }
+
+    /**
+     * get load bitmap height
+     * @return bitmap height
+     */
+    public int getBitmapHeight(){
+        return (int) (getWidth()*(getViewportHeight()*1.0f/getViewportWidth()));
     }
 
     /**

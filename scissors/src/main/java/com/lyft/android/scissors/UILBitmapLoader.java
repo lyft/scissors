@@ -29,7 +29,7 @@ public class UILBitmapLoader implements BitmapLoader {
     }
 
     public static BitmapLoader createUsing(CropView cropView, ImageLoader imageLoader) {
-        return new UILBitmapLoader(imageLoader, UILFillViewportDisplayer.createUsing(cropView.getViewportWidth(), cropView.getViewportHeight()));
+        return new UILBitmapLoader(imageLoader, UILFillViewportDisplayer.createUsing(cropView.getWidth(), cropView.getBitmapHeight()));
     }
 
     @Override

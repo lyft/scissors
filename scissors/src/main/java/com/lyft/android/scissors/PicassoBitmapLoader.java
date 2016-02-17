@@ -68,6 +68,6 @@ public class PicassoBitmapLoader implements BitmapLoader {
 
     public static BitmapLoader createUsing(CropView cropView, Picasso picasso) {
         return new PicassoBitmapLoader(picasso,
-                PicassoFillViewportTransformation.createUsing(cropView.getViewportWidth(), cropView.getViewportHeight()));
+                PicassoFillViewportTransformation.createUsing(cropView.getWidth(), cropView.getBitmapHeight()));
     }
 }

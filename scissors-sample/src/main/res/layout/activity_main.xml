@@ -9,7 +9,9 @@
         android:id="@+id/crop_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cropviewViewportHeightRatio="1"
+        app:cropviewRatio="0.8"
+        app:cropviewBorderColor="@android:color/white"
+        app:cropviewViewportHeightRatio="1.25"
         />
 
     <android.support.design.widget.FloatingActionButton

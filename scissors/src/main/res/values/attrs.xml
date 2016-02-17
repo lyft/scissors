@@ -9,5 +9,10 @@
         <attr name="cropviewMaxScale" format="float" />
         <!-- Minimum  zoom level -->
         <attr name="cropviewMinScale" format="float" />
+
+        <!-- a ratio of the crop area's width-->
+        <attr name="cropviewRatio" format="float" />
+        <!-- crop border line color-->
+        <attr name="cropviewBorderColor" format="color" />
     </declare-styleable>
 </resources>
