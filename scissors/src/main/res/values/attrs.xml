@@ -2,9 +2,11 @@
 <resources>
     <declare-styleable name="CropView">
         <!-- Viewport ratio used to compute height based off view width -->
-        <attr name="cropviewViewportHeightRatio" format="float" />
+        <attr name="cropviewViewportRatio" format="float" />
         <!-- Viewport overlay color -->
-        <attr name="cropviewViewportHeaderFooterColor" format="color" />
+        <attr name="cropviewViewportOverlayColor" format="color" />
+        <!-- Viewport overlay padding -->
+        <attr name="cropviewViewportOverlayPadding" format="dimension" />
         <!-- Maximum zoom level -->
         <attr name="cropviewMaxScale" format="float" />
         <!-- Minimum  zoom level -->
