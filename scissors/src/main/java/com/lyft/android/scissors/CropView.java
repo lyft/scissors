@@ -16,6 +16,7 @@
 package com.lyft.android.scissors;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,8 +33,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
+
 import com.lyft.android.scissors.CropViewExtensions.CropRequest;
 import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
+
 import java.io.File;
 import java.io.OutputStream;
 
@@ -316,6 +319,13 @@ public class CropView extends ImageView {
          */
         public void pickUsing(@NonNull Activity activity, int requestCode) {
             CropViewExtensions.pickUsing(activity, requestCode);
+        }
+
+        /**
+         * Perform a pick image request using {@link Fragment#startActivityForResult(Intent, int)}.
+         */
+        public void pickUsing(@NonNull Fragment fragment, int requestCode) {
+            CropViewExtensions.pickUsing(fragment, requestCode);
         }
     }
 }
