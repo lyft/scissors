@@ -15,23 +15,30 @@
  */
 package com.lyft.android.scissorssample;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+
+import com.lyft.android.scissors.CropView;
+import com.squareup.leakcanary.RefWatcher;
+
+import java.io.File;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import com.lyft.android.scissors.CropView;
-import com.squareup.leakcanary.RefWatcher;
-import java.io.File;
-import java.util.List;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -55,12 +62,28 @@ public class MainActivity extends Activity {
     @Bind(R.id.pick_fab)
     View pickButton;
 
-    @Bind(R.id.ratio_fab)
-    View ratioButton;
-
     CompositeSubscription subscriptions = new CompositeSubscription();
 
     private int selectedRatio = 0;
+    private AnimatorListener animatorListener = new AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            ButterKnife.apply(buttons, VISIBILITY, View.INVISIBLE);
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            ButterKnife.apply(buttons, VISIBILITY, View.VISIBLE);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +149,11 @@ public class MainActivity extends Activity {
             newRatio = cropView.getImageRatio();
         }
 
-        ObjectAnimator.ofFloat(cropView, "aspectRatio", oldRatio, newRatio).start();
+        ObjectAnimator viewportRatioAnimator = ObjectAnimator.ofFloat(cropView, "viewportRatio", oldRatio, newRatio)
+                .setDuration(420);
+        autoCancel(viewportRatioAnimator);
+        viewportRatioAnimator.addListener(animatorListener);
+        viewportRatioAnimator.start();
 
         Toast.makeText(this, ASPECT_LABELS[selectedRatio], Toast.LENGTH_SHORT).show();
     }
@@ -171,4 +198,11 @@ public class MainActivity extends Activity {
             view.setVisibility(visibility);
         }
     };
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    static void autoCancel(ObjectAnimator objectAnimator) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            objectAnimator.setAutoCancel(true);
+        }
+    }
 }
