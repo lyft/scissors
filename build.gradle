@@ -18,7 +18,7 @@ allprojects {
 ext {
     minSdkVersion = 14
     compileSdkVersion = 22
-    buildToolsVersion = '22.0.1'
+    buildToolsVersion = '23.0.2'
 
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
