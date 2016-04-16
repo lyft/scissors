@@ -16,12 +16,14 @@
 package com.lyft.android.scissors;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ViewTreeObserver;
+
 import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
@@ -29,16 +31,24 @@ import java.util.concurrent.Future;
 class CropViewExtensions {
 
     static void pickUsing(Activity activity, int requestCode) {
+        activity.startActivityForResult(
+                createChooserIntent(),
+                requestCode);
+    }
+
+    static void pickUsing(Fragment fragment, int requestCode) {
+        fragment.startActivityForResult(
+                createChooserIntent(),
+                requestCode);
+    }
+
+    private static Intent createChooserIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        Intent chooserIntent = Intent.createChooser(intent, null);
-
-        activity.startActivityForResult(
-                chooserIntent,
-                requestCode);
+        return Intent.createChooser(intent, null);
     }
 
     public static class LoadRequest {
