@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Version 1.1.0 *(2015-04-15)*
+
+- Add support for full overlay (#27 Thanks @rharter!)
+- Breaking changes attrs renamed: 
+  * cropviewViewportHeightRatio -> cropviewViewportRatio
+  * cropviewViewportHeaderFooterColor -> cropviewViewportOverlayColor
+- Add support for `pickUsing` framework `Fragment`s (#43)
+
 Version 1.0.3 *(2015-02-15)*
 ----------------------------
 
