@@ -19,7 +19,7 @@ See `scissors-sample`.
     android:id="@+id/crop_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cropviewViewportHeightRatio="1"
+    app:cropviewViewportRatio="1"
     />
 ```
 -  Set a Bitmap to be cropped. In example by calling `cropView.setImageBitmap(someBitmap);`
