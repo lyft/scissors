@@ -19,7 +19,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -64,17 +66,19 @@ class Utils {
         return EXECUTOR_SERVICE.submit(new Runnable() {
             @Override
             public void run() {
+                OutputStream outputStream = null;
+
                 try {
                     file.getParentFile().mkdirs();
-
-                    OutputStream outputStream = new FileOutputStream(file);
+                    outputStream = new FileOutputStream(file);
                     bitmap.compress(format, quality, outputStream);
                     outputStream.flush();
-                    outputStream.close();
                 } catch (final Throwable throwable) {
                     if (BuildConfig.DEBUG) {
                         Log.e(TAG, "Error attempting to save bitmap.", throwable);
                     }
+                } finally {
+                    closeQuietly(outputStream);
                 }
             }
         }, null);
@@ -92,15 +96,26 @@ class Utils {
                 try {
                     bitmap.compress(format, quality, outputStream);
                     outputStream.flush();
-                    if (closeWhenDone) {
-                        outputStream.close();
-                    }
                 } catch (final Throwable throwable) {
                     if (BuildConfig.DEBUG) {
                         Log.e(TAG, "Error attempting to save bitmap.", throwable);
                     }
+                } finally {
+                    if (closeWhenDone) {
+                        closeQuietly(outputStream);
+                    }
                 }
             }
         }, null);
+    }
+
+    private static void closeQuietly(@Nullable OutputStream outputStream) {
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error attempting to close stream.", e);
+        }
     }
 }
