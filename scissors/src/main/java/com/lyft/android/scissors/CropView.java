@@ -50,7 +50,7 @@ public class CropView extends ImageView {
     private static final int MAX_TOUCH_POINTS = 2;
     private TouchManager touchManager;
 
-    private Paint viewportPaint = new Paint();
+    private Paint viewportPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint bitmapPaint = new Paint();
 
     private Bitmap bitmap;
