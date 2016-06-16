@@ -118,4 +118,24 @@ class Utils {
             Log.e(TAG, "Error attempting to close stream.", e);
         }
     }
+
+    public static Bitmap scaleBitmap(Bitmap source, int requestedWidth, int requestedHeight) {
+        // Calculate scale required for requested size
+        int scale = 1;
+        if (requestedWidth > 0) {
+            while (source.getWidth() / scale > requestedWidth) {
+                scale *= 2;
+            }
+        }
+        if (requestedHeight > 0) {
+            while (source.getHeight() / scale > requestedHeight) {
+                scale *= 2;
+            }
+        }
+
+        // Create and return scaled bitmap
+        final int width = source.getWidth() / scale;
+        final int height = source.getHeight() / scale;
+        return Bitmap.createScaledBitmap(source, width, height, false);
+    }
 }

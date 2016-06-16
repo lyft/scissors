@@ -117,6 +117,8 @@ class CropViewExtensions {
         private final CropView cropView;
         private Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
         private int quality = CropViewConfig.DEFAULT_IMAGE_QUALITY;
+        private int requestedWidth = 0;
+        private int requestedHeight = 0;
 
         CropRequest(@NonNull CropView cropView) {
             Utils.checkNotNull(cropView, "cropView == null");
@@ -145,6 +147,13 @@ class CropViewExtensions {
             return this;
         }
 
+        public CropRequest dimensions(int width, int height) {
+            Utils.checkArg(width >= 0 && height >= 0, "requested width and height must be >= 0");
+            this.requestedWidth = width;
+            this.requestedHeight = height;
+            return this;
+        }
+
         /**
          * Asynchronously flush cropped bitmap into provided file, creating parent directory if required. This is performed in another
          * thread.
@@ -153,7 +162,7 @@ class CropViewExtensions {
          * @return {@link Future} used to cancel or wait for this request.
          */
         public Future<Void> into(@NonNull File file) {
-            final Bitmap croppedBitmap = cropView.crop();
+            final Bitmap croppedBitmap = cropView.crop(requestedWidth, requestedHeight);
             return Utils.flushToFile(croppedBitmap, format, quality, file);
         }
 
@@ -165,7 +174,7 @@ class CropViewExtensions {
          * @return {@link Future} used to cancel or wait for this request.
          */
         public Future<Void> into(@NonNull OutputStream outputStream, boolean closeWhenDone) {
-            final Bitmap croppedBitmap = cropView.crop();
+            final Bitmap croppedBitmap = cropView.crop(requestedWidth, requestedHeight);
             return Utils.flushToStream(croppedBitmap, format, quality, outputStream, closeWhenDone);
         }
     }
