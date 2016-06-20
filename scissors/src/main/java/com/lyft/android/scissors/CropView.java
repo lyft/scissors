@@ -278,6 +278,19 @@ public class CropView extends ImageView {
      */
     @Nullable
     public Bitmap crop() {
+        return crop(bitmap.getWidth(), bitmap.getHeight());
+    }
+
+    /**
+     * Performs synchronous image cropping based on configuration.
+     *
+     * @return A {@link Bitmap} cropped based on viewport and user panning and zooming or <code>null</code> if no {@link Bitmap} has been
+     * provided.
+     * @param requestedWidth Width to which to downscale the cropped image (pixels)
+     * @param requestedHeight Height to which to downscale the cropped image (pixels)
+     */
+    @Nullable
+    public Bitmap crop(int requestedWidth, int requestedHeight) {
         if (bitmap == null) {
             return null;
         }
@@ -285,9 +298,8 @@ public class CropView extends ImageView {
         final Bitmap src = bitmap;
         final Bitmap.Config srcConfig = src.getConfig();
         final Bitmap.Config config = srcConfig == null ? Bitmap.Config.ARGB_8888 : srcConfig;
-        final int viewportHeight = touchManager.getViewportHeight();
         final int viewportWidth = touchManager.getViewportWidth();
-
+        final int viewportHeight = touchManager.getViewportHeight();
         final Bitmap dst = Bitmap.createBitmap(viewportWidth, viewportHeight, config);
 
         Canvas canvas = new Canvas(dst);
@@ -296,8 +308,7 @@ public class CropView extends ImageView {
         canvas.translate(-left, -top);
 
         drawBitmap(canvas);
-
-        return dst;
+        return Utils.scaleBitmap(dst, requestedWidth, requestedHeight);
     }
 
     /**
