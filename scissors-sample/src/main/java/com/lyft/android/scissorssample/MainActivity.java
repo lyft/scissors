@@ -118,6 +118,8 @@ public class MainActivity extends Activity {
                 .crop()
                 .quality(100)
                 .format(JPEG)
+                //.originalSize()
+                //.outputSize(320, 320)
                 .into(croppedFile))
                 .subscribeOn(io())
                 .observeOn(mainThread());
