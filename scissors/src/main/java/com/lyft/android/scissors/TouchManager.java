@@ -92,7 +92,7 @@ class TouchManager {
         if (bitmapWidth > 0 && bitmapHeight > 0) {
             setMinimumScale();
             setLimits();
-            ensureInsideViewport();
+            centerInViewport();
         }
     }
 
@@ -126,6 +126,15 @@ class TouchManager {
         }
         updateScale();
         setLimits();
+    }
+
+    private void centerInViewport() {
+        if (imageBounds == null) {
+            return;
+        }
+        float newX = imageBounds.right;
+        float newY = imageBounds.bottom;
+        position.set(newX, newY);
     }
 
     private void ensureInsideViewport() {
