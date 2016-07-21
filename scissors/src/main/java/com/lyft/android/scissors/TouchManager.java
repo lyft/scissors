@@ -92,6 +92,7 @@ class TouchManager {
         if (bitmapWidth > 0 && bitmapHeight > 0) {
             setMinimumScale();
             setLimits();
+            resetPosition();
             ensureInsideViewport();
         }
     }
@@ -201,6 +202,10 @@ class TouchManager {
     private void setLimits() {
         horizontalLimit = computeLimit((int) (bitmapWidth * scale), viewportWidth);
         verticalLimit = computeLimit((int) (bitmapHeight * scale), viewportHeight);
+    }
+
+    private void resetPosition() {
+        position.set(imageBounds.right, imageBounds.bottom);
     }
 
     private void setMinimumScale() {
