@@ -28,11 +28,16 @@ class CropViewConfig {
     public static final int DEFAULT_VIEWPORT_OVERLAY_PADDING = 0;
     public static final int DEFAULT_VIEWPORT_OVERLAY_COLOR = 0xC8000000; // Black with 200 alpha
 
+    public static final int SHAPE_SQUARE = 0;
+    public static final int SHAPE_CIRCLE = 1;
+
     private float viewportRatio = DEFAULT_VIEWPORT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
     private float minScale = DEFAULT_MINIMUM_SCALE;
     private int viewportOverlayPadding = DEFAULT_VIEWPORT_OVERLAY_PADDING;
     private int viewportOverlayColor = DEFAULT_VIEWPORT_OVERLAY_COLOR;
+
+    private int shape = SHAPE_SQUARE;
 
     public int getViewportOverlayColor() {
         return viewportOverlayColor;
@@ -74,6 +79,14 @@ class CropViewConfig {
         this.minScale = minScale <= 0 ? DEFAULT_MINIMUM_SCALE : minScale;
     }
 
+    void setShape(int shape){
+        this.shape = (shape == SHAPE_SQUARE || shape == SHAPE_CIRCLE) ? shape : SHAPE_SQUARE;
+    }
+
+    void getShape(){
+        return this.shape;
+    }
+
     public static CropViewConfig from(Context context, AttributeSet attrs) {
         final CropViewConfig cropViewConfig = new CropViewConfig();
 
@@ -104,6 +117,8 @@ class CropViewConfig {
         cropViewConfig.setViewportOverlayPadding(
             attributes.getDimensionPixelSize(R.styleable.CropView_cropviewViewportOverlayPadding,
                 CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_PADDING));
+
+        cropViewConfig.setShape(attributes.getInt(R.styleable.CropView_cropviewOverlayShape, SHAPE_SQUARE));
 
         attributes.recycle();
 

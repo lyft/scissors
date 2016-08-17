@@ -44,16 +44,19 @@ import java.io.OutputStream;
  * An {@link ImageView} with a fixed viewport and cropping capabilities.
  */
 public class CropView extends ImageView {
-
+    
     private static final int MAX_TOUCH_POINTS = 2;
     private TouchManager touchManager;
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
+    private Paint maskPaint = new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
     private Extensions extensions;
+
+    private int shape;
 
     public CropView(Context context) {
         super(context);
@@ -70,9 +73,11 @@ public class CropView extends ImageView {
         CropViewConfig config = CropViewConfig.from(context, attrs);
 
         touchManager = new TouchManager(MAX_TOUCH_POINTS, config);
+        shape = config.getShape();
 
         bitmapPaint.setFilterBitmap(true);
         viewportPaint.setColor(config.getViewportOverlayColor());
+        maskPaint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
     }
 
     @Override
@@ -100,10 +105,16 @@ public class CropView extends ImageView {
         final int left = (getWidth() - viewportWidth) / 2;
         final int top = (getHeight() - viewportHeight) / 2;
 
-        canvas.drawRect(0, top, left, getHeight() - top, viewportPaint);
-        canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
-        canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
-        canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+        if(shape == CropViewConfig.SHAPE_SQUARE){
+            canvas.drawRect(0, top, left, getHeight() - top, viewportPaint);
+            canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
+            canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
+            canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+        } else {
+            canvas.drawRect(0, 0, getWidth(), getHeight, viewportPaint);
+            canvas.drawCircle(getWidth() / 2, getHeight() / 2, viewportWidth/2, maskPaint);
+        }
+        
     }
 
     @Override
