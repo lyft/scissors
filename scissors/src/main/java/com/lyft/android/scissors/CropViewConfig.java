@@ -17,6 +17,7 @@ package com.lyft.android.scissors;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 
 class CropViewConfig {
@@ -28,8 +29,11 @@ class CropViewConfig {
     public static final int DEFAULT_VIEWPORT_OVERLAY_PADDING = 0;
     public static final int DEFAULT_VIEWPORT_OVERLAY_COLOR = 0xC8000000; // Black with 200 alpha
 
-    public static final int SHAPE_SQUARE = 0;
-    public static final int SHAPE_CIRCLE = 1;
+    public static final int SHAPE_RECTANGLE = 0;
+    public static final int SHAPE_OVAL = 1;
+
+    @IntDef({SHAPE_RECTANGLE, SHAPE_OVAL})
+    public static @interface ShapeConfig{}
 
     private float viewportRatio = DEFAULT_VIEWPORT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
@@ -37,7 +41,7 @@ class CropViewConfig {
     private int viewportOverlayPadding = DEFAULT_VIEWPORT_OVERLAY_PADDING;
     private int viewportOverlayColor = DEFAULT_VIEWPORT_OVERLAY_COLOR;
 
-    private int shape = SHAPE_SQUARE;
+    private int shape = SHAPE_RECTANGLE;
 
     public int getViewportOverlayColor() {
         return viewportOverlayColor;
@@ -80,10 +84,10 @@ class CropViewConfig {
     }
 
     void setShape(int shape){
-        this.shape = (shape == SHAPE_SQUARE || shape == SHAPE_CIRCLE) ? shape : SHAPE_SQUARE;
+        this.shape = (shape == SHAPE_RECTANGLE || shape == SHAPE_OVAL) ? shape : SHAPE_RECTANGLE;
     }
 
-    void getShape(){
+    int getShape(){
         return this.shape;
     }
 
@@ -118,7 +122,7 @@ class CropViewConfig {
             attributes.getDimensionPixelSize(R.styleable.CropView_cropviewViewportOverlayPadding,
                 CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_PADDING));
 
-        cropViewConfig.setShape(attributes.getInt(R.styleable.CropView_cropviewOverlayShape, SHAPE_SQUARE));
+        cropViewConfig.setShape(attributes.getInt(R.styleable.CropView_cropviewOverlayShape, SHAPE_RECTANGLE));
 
         attributes.recycle();
 

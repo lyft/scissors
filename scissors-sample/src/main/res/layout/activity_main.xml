@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cropviewViewportRatio="1"
+        app:cropviewViewportOverlayPadding="64dp"
+        app:cropviewOverlayShape="oval"
         />
 
     <android.support.design.widget.FloatingActionButton
