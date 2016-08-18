@@ -24,6 +24,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -50,10 +53,16 @@ public class CropView extends ImageView {
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
+    private Paint maskPaint = new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
     private Extensions extensions;
+
+    private RectF bounds = new RectF();
+    private RectF viewportRect = new RectF();
+
+    private int shape;
 
     public CropView(Context context) {
         super(context);
@@ -70,9 +79,13 @@ public class CropView extends ImageView {
         CropViewConfig config = CropViewConfig.from(context, attrs);
 
         touchManager = new TouchManager(MAX_TOUCH_POINTS, config);
+        shape = config.getShape();
 
         bitmapPaint.setFilterBitmap(true);
         viewportPaint.setColor(config.getViewportOverlayColor());
+//        viewportPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OVER));
+        maskPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.XOR));
+        maskPaint.setColor(0xFFFFFFFF);
     }
 
     @Override
@@ -95,15 +108,25 @@ public class CropView extends ImageView {
     }
 
     private void drawOverlay(Canvas canvas) {
-        final int viewportWidth = touchManager.getViewportWidth();
-        final int viewportHeight = touchManager.getViewportHeight();
-        final int left = (getWidth() - viewportWidth) / 2;
-        final int top = (getHeight() - viewportHeight) / 2;
+        int viewportWidth = touchManager.getViewportWidth();
+        int viewportHeight = touchManager.getViewportHeight();
+        int width = getWidth();
+        int height = getHeight();
+        final int left = (width - viewportWidth) >> 1;
+        final int top = (height - viewportHeight) >> 1;
+        bounds.set(0, 0, width, height);
+        viewportRect.set(left, top, left + viewportWidth, top + viewportHeight);
 
-        canvas.drawRect(0, top, left, getHeight() - top, viewportPaint);
-        canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
-        canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
-        canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+        canvas.saveLayer(bounds, null, Canvas.CLIP_SAVE_FLAG);
+        canvas.drawRect(0, 0, width, height, viewportPaint);
+
+        if (shape == CropViewConfig.SHAPE_RECTANGLE) {
+            canvas.drawRect(viewportRect, maskPaint);
+        } else {
+            canvas.drawOval(viewportRect, maskPaint);
+        }
+        canvas.restore();
+
     }
 
     @Override
@@ -144,6 +167,10 @@ public class CropView extends ImageView {
         touchManager.setAspectRatio(ratio);
         resetTouchManager();
         invalidate();
+    }
+
+    public void setShape(@CropViewConfig.ShapeConfig int shape){
+        this.shape = shape;
     }
 
     @Override
