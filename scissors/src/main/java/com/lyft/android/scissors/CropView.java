@@ -27,13 +27,13 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-
 import com.lyft.android.scissors.CropViewExtensions.CropRequest;
 import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
 
@@ -47,6 +47,7 @@ public class CropView extends ImageView {
 
     private static final int MAX_TOUCH_POINTS = 2;
     private TouchManager touchManager;
+    private CropViewConfig config;
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
@@ -67,12 +68,12 @@ public class CropView extends ImageView {
     }
 
     void initCropView(Context context, AttributeSet attrs) {
-        CropViewConfig config = CropViewConfig.from(context, attrs);
+        config = CropViewConfig.from(context, attrs);
 
         touchManager = new TouchManager(MAX_TOUCH_POINTS, config);
 
         bitmapPaint.setFilterBitmap(true);
-        viewportPaint.setColor(config.getViewportOverlayColor());
+        setViewportOverlayColor(config.getViewportOverlayColor());
     }
 
     @Override
@@ -110,6 +111,26 @@ public class CropView extends ImageView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         resetTouchManager();
+    }
+
+    /**
+     * Sets the color of the viewport overlay
+     *
+     * @param viewportOverlayColor The color to use for the viewport overlay
+     */
+    public void setViewportOverlayColor(@ColorInt int viewportOverlayColor) {
+        viewportPaint.setColor(viewportOverlayColor);
+      config.setViewportOverlayColor(viewportOverlayColor);
+    }
+
+  /**
+   * Sets the padding for the viewport overlay
+   * @param viewportOverlayPadding The new padding of the viewport overlay
+   */
+  public void setViewportOverlayPadding(int viewportOverlayPadding) {
+        config.setViewportOverlayPadding(viewportOverlayPadding);
+        resetTouchManager();
+        invalidate();
     }
 
     /**
