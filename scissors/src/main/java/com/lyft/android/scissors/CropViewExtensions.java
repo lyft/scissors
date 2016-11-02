@@ -18,15 +18,7 @@ package com.lyft.android.scissors;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.ViewTreeObserver;
-
-import java.io.File;
-import java.io.OutputStream;
-import java.util.concurrent.Future;
 
 class CropViewExtensions {
 
@@ -49,125 +41,6 @@ class CropViewExtensions {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         return Intent.createChooser(intent, null);
-    }
-
-    public static class LoadRequest {
-
-        private final CropView cropView;
-        private BitmapLoader bitmapLoader;
-
-        LoadRequest(CropView cropView) {
-            Utils.checkNotNull(cropView, "cropView == null");
-            this.cropView = cropView;
-        }
-
-        /**
-         * Load a {@link Bitmap} using given {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
-         *
-         * @param bitmapLoader {@link BitmapLoader} to use
-         * @return current request for chaining, you should call {@link #load(Object)} afterwards.
-         */
-        public LoadRequest using(@Nullable BitmapLoader bitmapLoader) {
-            this.bitmapLoader = bitmapLoader;
-            return this;
-        }
-
-        /**
-         * Load a {@link Bitmap} using a {@link BitmapLoader} into {@link CropView}
-         *
-         * @param model Model used by {@link BitmapLoader} to load desired {@link Bitmap}
-         */
-        public void load(@Nullable Object model) {
-            if (cropView.getWidth() == 0 && cropView.getHeight() == 0) {
-                // Defer load until layout pass
-                deferLoad(model);
-                return;
-            }
-            performLoad(model);
-        }
-
-        void performLoad(Object model) {
-            if (bitmapLoader == null) {
-                bitmapLoader = resolveBitmapLoader(cropView);
-            }
-            bitmapLoader.load(model, cropView);
-        }
-
-        void deferLoad(final Object model) {
-            if (!cropView.getViewTreeObserver().isAlive()) {
-                return;
-            }
-            cropView.getViewTreeObserver().addOnGlobalLayoutListener(
-                    new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            if (cropView.getViewTreeObserver().isAlive()) {
-                                //noinspection deprecation
-                                cropView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                            }
-                            performLoad(model);
-                        }
-                    }
-            );
-        }
-    }
-
-    public static class CropRequest {
-
-        private final CropView cropView;
-        private Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
-        private int quality = CropViewConfig.DEFAULT_IMAGE_QUALITY;
-
-        CropRequest(@NonNull CropView cropView) {
-            Utils.checkNotNull(cropView, "cropView == null");
-            this.cropView = cropView;
-        }
-
-        /**
-         * Compression format to use, defaults to {@link Bitmap.CompressFormat#JPEG}.
-         *
-         * @return current request for chaining.
-         */
-        public CropRequest format(@NonNull Bitmap.CompressFormat format) {
-            Utils.checkNotNull(format, "format == null");
-            this.format = format;
-            return this;
-        }
-
-        /**
-         * Compression quality to use (must be 0..100), defaults to {@value CropViewConfig#DEFAULT_IMAGE_QUALITY}.
-         *
-         * @return current request for chaining.
-         */
-        public CropRequest quality(int quality) {
-            Utils.checkArg(quality >= 0 && quality <= 100, "quality must be 0..100");
-            this.quality = quality;
-            return this;
-        }
-
-        /**
-         * Asynchronously flush cropped bitmap into provided file, creating parent directory if required. This is performed in another
-         * thread.
-         *
-         * @param file Must have permissions to write, will be created if doesn't exist or overwrite if it does.
-         * @return {@link Future} used to cancel or wait for this request.
-         */
-        public Future<Void> into(@NonNull File file) {
-            final Bitmap croppedBitmap = cropView.crop();
-            return Utils.flushToFile(croppedBitmap, format, quality, file);
-        }
-
-        /**
-         * Asynchronously flush cropped bitmap into provided stream.
-         *
-         * @param outputStream Stream to write to
-         * @param closeWhenDone wetter or not to close provided stream once flushing is done
-         * @return {@link Future} used to cancel or wait for this request.
-         */
-        public Future<Void> into(@NonNull OutputStream outputStream, boolean closeWhenDone) {
-            final Bitmap croppedBitmap = cropView.crop();
-            return Utils.flushToStream(croppedBitmap, format, quality, outputStream, closeWhenDone);
-        }
     }
 
     final static boolean HAS_PICASSO = canHasClass("com.squareup.picasso.Picasso");

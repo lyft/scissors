@@ -34,9 +34,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import com.lyft.android.scissors.CropViewExtensions.CropRequest;
-import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
-
 import java.io.File;
 import java.io.OutputStream;
 
