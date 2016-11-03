@@ -28,6 +28,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -39,6 +40,8 @@ import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * An {@link ImageView} with a fixed viewport and cropping capabilities.
@@ -299,6 +302,28 @@ public class CropView extends ImageView {
          */
         public LoadRequest using(@Nullable BitmapLoader bitmapLoader) {
             return new LoadRequest(cropView).using(bitmapLoader);
+        }
+
+        @IntDef({LOADER_INVALID, LOADER_PICASSO, LOADER_GLIDE, LOADER_UIL})
+        @Retention(RetentionPolicy.CLASS)
+        @interface ExtensionBitmapLoader{}
+
+        static final int LOADER_INVALID = -1;
+        public static final int LOADER_PICASSO = 0;
+        public static final int LOADER_GLIDE = 1;
+        public static final int LOADER_UIL = 2;
+
+      /**
+       * Load a {@link Bitmap} using a reference to a {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
+       *
+       * Please ensure that the library for the {@link BitmapLoader} you reference is available on the classpath.
+       *
+       * @param bitmapLoaderReference a reference to the {@link BitmapLoader} to use to load desired (@link Bitmap}
+       * @see PicassoBitmapLoader
+       * @see GlideBitmapLoader
+       */
+        public LoadRequest using(@ExtensionBitmapLoader int bitmapLoaderReference) {
+            return new LoadRequest(cropView).using(bitmapLoaderReference);
         }
 
         /**

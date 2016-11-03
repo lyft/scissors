@@ -28,6 +28,11 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
 
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_GLIDE;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_INVALID;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_PICASSO;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_UIL;
+
 class CropViewExtensions {
 
     static void pickUsing(Activity activity, int requestCode) {
@@ -55,6 +60,7 @@ class CropViewExtensions {
 
         private final CropView cropView;
         private BitmapLoader bitmapLoader;
+        @CropView.Extensions.ExtensionBitmapLoader private int bitmapLoaderReference = LOADER_INVALID;
 
         LoadRequest(CropView cropView) {
             Utils.checkNotNull(cropView, "cropView == null");
@@ -69,6 +75,17 @@ class CropViewExtensions {
          */
         public LoadRequest using(@Nullable BitmapLoader bitmapLoader) {
             this.bitmapLoader = bitmapLoader;
+            return this;
+        }
+
+        /**
+         * Load a {@link Bitmap} using the {@link BitmapLoader} specified by {@code bitmapLoaderReference}, you must call {@link LoadRequest#load(Object)} afterwards.
+         *
+         * @param bitmapLoaderReference a reference to the {@link BitmapLoader} to use
+         * @return current request for chaining, you should call {@link #load(Object)} afterwards.
+         */
+        public LoadRequest using(@CropView.Extensions.ExtensionBitmapLoader int bitmapLoaderReference) {
+            this.bitmapLoaderReference = bitmapLoaderReference;
             return this;
         }
 
@@ -88,7 +105,7 @@ class CropViewExtensions {
 
         void performLoad(Object model) {
             if (bitmapLoader == null) {
-                bitmapLoader = resolveBitmapLoader(cropView);
+                bitmapLoader = resolveBitmapLoader(cropView, bitmapLoaderReference);
             }
             bitmapLoader.load(model, cropView);
         }
@@ -174,7 +191,18 @@ class CropViewExtensions {
     final static boolean HAS_GLIDE = canHasClass("com.bumptech.glide.Glide");
     final static boolean HAS_UIL = canHasClass("com.nostra13.universalimageloader.core.ImageLoader");
 
-    static BitmapLoader resolveBitmapLoader(CropView cropView) {
+    static BitmapLoader resolveBitmapLoader(CropView cropView, @CropView.Extensions.ExtensionBitmapLoader int bitmapLoaderReference) {
+        switch (bitmapLoaderReference) {
+            case LOADER_INVALID:
+                break;
+            case LOADER_PICASSO:
+                return PicassoBitmapLoader.createUsing(cropView);
+            case LOADER_GLIDE:
+                return GlideBitmapLoader.createUsing(cropView);
+            case LOADER_UIL:
+                return UILBitmapLoader.createUsing(cropView);
+        }
+
         if (HAS_PICASSO) {
             return PicassoBitmapLoader.createUsing(cropView);
         }

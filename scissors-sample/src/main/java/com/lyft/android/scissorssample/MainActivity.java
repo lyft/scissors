@@ -28,20 +28,18 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
-import com.lyft.android.scissors.CropView;
-import com.squareup.leakcanary.RefWatcher;
-
-import java.io.File;
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
+import com.lyft.android.scissors.CropView;
+import com.squareup.leakcanary.RefWatcher;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
+
+import java.io.File;
+import java.util.List;
 
 import static android.graphics.Bitmap.CompressFormat.JPEG;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
