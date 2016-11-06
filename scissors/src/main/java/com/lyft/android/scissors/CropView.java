@@ -36,7 +36,6 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import com.lyft.android.scissors.CropViewExtensions.CropRequest;
 import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
-
 import java.io.File;
 import java.io.OutputStream;
 
@@ -120,14 +119,15 @@ public class CropView extends ImageView {
      */
     public void setViewportOverlayColor(@ColorInt int viewportOverlayColor) {
         viewportPaint.setColor(viewportOverlayColor);
-      config.setViewportOverlayColor(viewportOverlayColor);
+        config.setViewportOverlayColor(viewportOverlayColor);
     }
 
-  /**
-   * Sets the padding for the viewport overlay
-   * @param viewportOverlayPadding The new padding of the viewport overlay
-   */
-  public void setViewportOverlayPadding(int viewportOverlayPadding) {
+    /**
+     * Sets the padding for the viewport overlay
+     *
+     * @param viewportOverlayPadding The new padding of the viewport overlay
+     */
+    public void setViewportOverlayPadding(int viewportOverlayPadding) {
         config.setViewportOverlayPadding(viewportOverlayPadding);
         resetTouchManager();
         invalidate();
