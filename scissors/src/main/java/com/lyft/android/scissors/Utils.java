@@ -25,6 +25,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -58,14 +59,14 @@ class Utils {
     private final static ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private static final String TAG = "scissors.Utils";
 
-    public static Future<Void> flushToFile(final Bitmap bitmap,
+    public static Future<Integer> flushToFile(final Bitmap bitmap,
             final Bitmap.CompressFormat format,
             final int quality,
             final File file) {
 
-        return EXECUTOR_SERVICE.submit(new Runnable() {
+        return EXECUTOR_SERVICE.submit(new Callable<Integer>() {
             @Override
-            public void run() {
+                public Integer call() throws Exception{
                 OutputStream outputStream = null;
 
                 try {
@@ -80,19 +81,20 @@ class Utils {
                 } finally {
                     closeQuietly(outputStream);
                 }
+                return 0;
             }
-        }, null);
+        });
     }
 
-    public static Future<Void> flushToStream(final Bitmap bitmap,
+    public static Future<Integer> flushToStream(final Bitmap bitmap,
             final Bitmap.CompressFormat format,
             final int quality,
             final OutputStream outputStream,
             final boolean closeWhenDone) {
 
-        return EXECUTOR_SERVICE.submit(new Runnable() {
+        return EXECUTOR_SERVICE.submit(new Callable<Integer>() {
             @Override
-            public void run() {
+            public Integer call() throws Exception {
                 try {
                     bitmap.compress(format, quality, outputStream);
                     outputStream.flush();
@@ -105,8 +107,9 @@ class Utils {
                         closeQuietly(outputStream);
                     }
                 }
+                return 0;
             }
-        }, null);
+        });
     }
 
     private static void closeQuietly(@Nullable OutputStream outputStream) {

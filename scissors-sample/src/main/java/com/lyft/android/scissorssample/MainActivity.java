@@ -39,13 +39,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.graphics.Bitmap.CompressFormat.JPEG;
-import static rx.android.schedulers.AndroidSchedulers.mainThread;
-import static rx.schedulers.Schedulers.io;
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
 public class MainActivity extends Activity {
 
@@ -62,7 +64,7 @@ public class MainActivity extends Activity {
     @Bind(R.id.pick_fab)
     View pickButton;
 
-    CompositeSubscription subscriptions = new CompositeSubscription();
+    CompositeDisposable subscriptions = new CompositeDisposable();
 
     private int selectedRatio = 0;
     private AnimatorListener animatorListener = new AnimatorListener() {
@@ -114,18 +116,18 @@ public class MainActivity extends Activity {
     public void onCropClicked() {
         final File croppedFile = new File(getCacheDir(), "cropped.jpg");
 
-        Observable<Void> onSave = Observable.from(cropView.extensions()
+        Observable<Integer> onSave = Observable.fromFuture(cropView.extensions()
                 .crop()
                 .quality(100)
                 .format(JPEG)
                 .into(croppedFile))
-                .subscribeOn(io())
-                .observeOn(mainThread());
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
 
         subscriptions.add(onSave
-                .subscribe(new Action1<Void>() {
+                .subscribe(new Consumer<Integer>() {
                     @Override
-                    public void call(Void nothing) {
+                    public void accept(Integer nothing) {
                         CropResultActivity.startUsing(croppedFile, MainActivity.this);
                     }
                 }));
@@ -162,7 +164,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
-        subscriptions.unsubscribe();
+        subscriptions.dispose();
 
         RefWatcher refWatcher = App.getRefWatcher(this);
         refWatcher.watch(this, "MainActivity");
