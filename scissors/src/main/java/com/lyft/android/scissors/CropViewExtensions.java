@@ -147,6 +147,13 @@ class CropViewExtensions {
             return this;
         }
 
+        /**
+         * Maximum dimensions of the output image. By default, the output image is not downscaled.
+         *
+         * @param width Maximum width in pixels
+         * @param height Maximum height in pixels
+         * @return current request for chaining.
+         */
         public CropRequest dimensions(int width, int height) {
             Utils.checkArg(width >= 0 && height >= 0, "requested width and height must be >= 0");
             this.requestedWidth = width;
