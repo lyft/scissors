@@ -293,6 +293,14 @@ public class CropView extends ImageView {
     }
 
     /**
+     * Get the transform matrix
+     * @return
+     */
+    public Matrix getTransformMatrix() {
+        return transform;
+    }
+
+    /**
      * Optional extensions to perform common actions involving a {@link CropView}
      */
     public static class Extensions {
