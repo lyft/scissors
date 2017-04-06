@@ -31,15 +31,20 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
+
 import com.lyft.android.scissors.CropViewExtensions.CropRequest;
 import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
+
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * An {@link ImageView} with a fixed viewport and cropping capabilities.
@@ -57,9 +62,17 @@ public class CropView extends ImageView {
     private Matrix transform = new Matrix();
     private Extensions extensions;
 
-    private int shape = 0;
-    private Path ovalPath = new Path();
-    private RectF ovalRect = new RectF();
+    /** Corresponds to the values in {@link com.lyft.android.scissors.R.attr#cropviewShape} */
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ Shape.RECTANGLE, Shape.OVAL })
+    public @interface Shape {
+        int RECTANGLE = 0;
+        int OVAL = 1;
+    }
+
+    private @Shape int shape = Shape.RECTANGLE;
+    private Path ovalPath;
+    private RectF ovalRect;
 
     public CropView(Context context) {
         super(context);
@@ -81,10 +94,8 @@ public class CropView extends ImageView {
         setViewportOverlayColor(config.getViewportOverlayColor());
         shape = config.shape();
 
-        // If shape is not a rectangle, we need anti-aliased Paint to smooth the curved edges
-        if (shape != 0) {
-            viewportPaint.setFlags(viewportPaint.getFlags() | Paint.ANTI_ALIAS_FLAG);
-        }
+        // We need anti-aliased Paint to smooth the curved edges
+        viewportPaint.setFlags(viewportPaint.getFlags() | Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -96,7 +107,7 @@ public class CropView extends ImageView {
         }
 
         drawBitmap(canvas);
-        if (shape == 0) {
+        if (shape == Shape.RECTANGLE) {
             drawSquareOverlay(canvas);
         } else {
             drawOvalOverlay(canvas);
@@ -123,6 +134,13 @@ public class CropView extends ImageView {
     }
 
     private void drawOvalOverlay(Canvas canvas) {
+        if (ovalRect == null) {
+            ovalRect = new RectF();
+        }
+        if (ovalPath == null) {
+            ovalPath = new Path();
+        }
+
         final int viewportWidth = touchManager.getViewportWidth();
         final int viewportHeight = touchManager.getViewportHeight();
         final int left = (getWidth() - viewportWidth) / 2;
