@@ -117,6 +117,9 @@ class CropViewExtensions {
         private final CropView cropView;
         private Bitmap.CompressFormat format = Bitmap.CompressFormat.JPEG;
         private int quality = CropViewConfig.DEFAULT_IMAGE_QUALITY;
+        private int width;
+        private int height;
+        private boolean originalSize;
 
         CropRequest(@NonNull CropView cropView) {
             Utils.checkNotNull(cropView, "cropView == null");
@@ -146,6 +149,30 @@ class CropViewExtensions {
         }
 
         /**
+         * Fit cropped bitmap to original size.
+         *
+         * @return current request for chaining.
+         */
+        public CropRequest originalSize() {
+            this.originalSize = true;
+            this.width = 0;
+            this.height = 0;
+            return this;
+        }
+
+        /**
+         * Size of cropped bitmap.
+         *
+         * @return current request for chaining.
+         */
+        public CropRequest outputSize(int width, int height) {
+            this.originalSize = false;
+            this.width = width;
+            this.height = height;
+            return this;
+        }
+
+        /**
          * Asynchronously flush cropped bitmap into provided file, creating parent directory if required. This is performed in another
          * thread.
          *
@@ -153,7 +180,7 @@ class CropViewExtensions {
          * @return {@link Future} used to cancel or wait for this request.
          */
         public Future<Void> into(@NonNull File file) {
-            final Bitmap croppedBitmap = cropView.crop();
+            final Bitmap croppedBitmap = cropView.crop(calculateOutputScale());
             return Utils.flushToFile(croppedBitmap, format, quality, file);
         }
 
@@ -165,8 +192,21 @@ class CropViewExtensions {
          * @return {@link Future} used to cancel or wait for this request.
          */
         public Future<Void> into(@NonNull OutputStream outputStream, boolean closeWhenDone) {
-            final Bitmap croppedBitmap = cropView.crop();
+            final Bitmap croppedBitmap = cropView.crop(calculateOutputScale());
             return Utils.flushToStream(croppedBitmap, format, quality, outputStream, closeWhenDone);
+        }
+
+        private float calculateOutputScale() {
+            if (originalSize) {
+                Bitmap src = cropView.getImageBitmap();
+                if (src != null) {
+                    return cropView.calculateOutputScale(src.getWidth(), src.getHeight());
+                }
+            }
+            if (width > 0 && height > 0) {
+                return cropView.calculateOutputScale(width, height);
+            }
+            return 1.0f;
         }
     }
 

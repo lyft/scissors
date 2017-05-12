@@ -324,6 +324,18 @@ public class CropView extends ImageView {
      */
     @Nullable
     public Bitmap crop() {
+        return crop(1.0f);
+    }
+
+    /**
+     * Performs synchronous image cropping based on configuration.
+     *
+     * @param outputScale multiplied with viewport size for calculating bitmap size.
+     * @return A {@link Bitmap} cropped based on viewport and user panning and zooming or <code>null</code> if no {@link Bitmap} has been
+     * provided.
+     */
+    @Nullable
+    public Bitmap crop(float outputScale) {
         if (bitmap == null) {
             return null;
         }
@@ -334,16 +346,31 @@ public class CropView extends ImageView {
         final int viewportHeight = touchManager.getViewportHeight();
         final int viewportWidth = touchManager.getViewportWidth();
 
-        final Bitmap dst = Bitmap.createBitmap(viewportWidth, viewportHeight, config);
+        final Bitmap dst = Bitmap.createBitmap((int)(viewportWidth * outputScale), (int)(viewportHeight * outputScale), config);
 
         Canvas canvas = new Canvas(dst);
         final int left = (getRight() - viewportWidth) / 2;
         final int top = (getBottom() - viewportHeight) / 2;
-        canvas.translate(-left, -top);
+        canvas.translate(-left * outputScale, -top * outputScale);
 
-        drawBitmap(canvas);
+        Matrix transform = new Matrix();
+        touchManager.applyPositioningAndScale(transform);
+        transform.postScale(outputScale, outputScale);
+
+        canvas.drawBitmap(bitmap, transform, bitmapPaint);
 
         return dst;
+    }
+
+    float calculateOutputScale(int width, int height) {
+        final float viewportHeight = touchManager.getViewportHeight();
+        final float viewportWidth = touchManager.getViewportWidth();
+
+        if (width / (float)height > viewportWidth / viewportHeight) {
+            return height / viewportHeight; //fit to height
+        } else {
+            return  width / viewportWidth; //fit to width
+        }
     }
 
     /**
