@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 1.1.3 *(2017-10-02)*
+----------------------------
+- Add support for Glide 4
+
 Version 1.1.2 *(2017-03-28)*
 ----------------------------
 - Add support for oval overlay
