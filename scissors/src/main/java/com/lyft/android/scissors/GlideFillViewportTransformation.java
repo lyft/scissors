@@ -17,16 +17,22 @@ package com.lyft.android.scissors;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+
 class GlideFillViewportTransformation extends BitmapTransformation {
+
+    private static final String ID = "com.lyft.android.scissors.GlideFillViewportTransformation";
+    private static final byte[] ID_BYTES = ID.getBytes(Charset.defaultCharset());
 
     private final int viewportWidth;
     private final int viewportHeight;
 
-    public GlideFillViewportTransformation(BitmapPool bitmapPool, int viewportWidth, int viewportHeight) {
-        super(bitmapPool);
+    public GlideFillViewportTransformation(int viewportWidth, int viewportHeight) {
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
     }
@@ -49,11 +55,26 @@ class GlideFillViewportTransformation extends BitmapTransformation {
     }
 
     @Override
-    public String getId() {
-        return getClass().getName();
+    public boolean equals(Object obj) {
+        if (obj instanceof GlideFillViewportTransformation) {
+            GlideFillViewportTransformation other = (GlideFillViewportTransformation) obj;
+            return other.viewportWidth == viewportWidth && other.viewportHeight == viewportHeight;
+        }
+        return false;
     }
 
-    public static BitmapTransformation createUsing(BitmapPool bitmapPool, int viewportWidth, int viewportHeight) {
-        return new GlideFillViewportTransformation(bitmapPool, viewportWidth, viewportHeight);
+    @Override
+    public int hashCode() {
+        int hash = viewportWidth * 31 + viewportHeight;
+        return hash * 17 + ID.hashCode();
+    }
+
+    @Override
+    public void updateDiskCacheKey(MessageDigest messageDigest) {
+        messageDigest.update(ID_BYTES);
+    }
+
+    public static BitmapTransformation createUsing(int viewportWidth, int viewportHeight) {
+        return new GlideFillViewportTransformation(viewportWidth, viewportHeight);
     }
 }
