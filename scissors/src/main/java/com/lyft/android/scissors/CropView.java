@@ -420,6 +420,28 @@ public class CropView extends ImageView {
             return new LoadRequest(cropView).using(bitmapLoader);
         }
 
+        @IntDef({LOADER_INVALID, LOADER_PICASSO, LOADER_GLIDE, LOADER_UIL})
+        @Retention(RetentionPolicy.CLASS)
+        @interface ExtensionBitmapLoader{}
+
+        static final int LOADER_INVALID = -1;
+        public static final int LOADER_PICASSO = 0;
+        public static final int LOADER_GLIDE = 1;
+        public static final int LOADER_UIL = 2;
+
+      /**
+       * Load a {@link Bitmap} using a reference to a {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
+       *
+       * Please ensure that the library for the {@link BitmapLoader} you reference is available on the classpath.
+       *
+       * @param bitmapLoaderReference a reference to the {@link BitmapLoader} to use to load desired (@link Bitmap}
+       * @see PicassoBitmapLoader
+       * @see GlideBitmapLoader
+       */
+        public LoadRequest using(@ExtensionBitmapLoader int bitmapLoaderReference) {
+            return new LoadRequest(cropView).using(bitmapLoaderReference);
+        }
+
         /**
          * Perform an asynchronous crop request.
          *
