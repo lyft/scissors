@@ -4,13 +4,15 @@ import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.view.ViewTreeObserver;
 
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_INVALID;
 import static com.lyft.android.scissors.CropViewExtensions.resolveBitmapLoader;
 
 public class LoadRequest {
 
   private final CropView cropView;
   private BitmapLoader bitmapLoader;
-
+  @CropView.Extensions.ExtensionBitmapLoader private int bitmapLoaderReference = LOADER_INVALID;
+  
   LoadRequest(CropView cropView) {
     Utils.checkNotNull(cropView, "cropView == null");
     this.cropView = cropView;
@@ -25,6 +27,17 @@ public class LoadRequest {
   public LoadRequest using(@Nullable BitmapLoader bitmapLoader) {
     this.bitmapLoader = bitmapLoader;
     return this;
+  }
+  
+  /**
+   * Load a {@link Bitmap} using the {@link BitmapLoader} specified by {@code bitmapLoaderReference}, you must call {@link LoadRequest#load(Object)} afterwards.
+   *
+   * @param bitmapLoaderReference a reference to the {@link BitmapLoader} to use
+   * @return current request for chaining, you should call {@link #load(Object)} afterwards.
+   */
+  public LoadRequest using(@CropView.Extensions.ExtensionBitmapLoader int bitmapLoaderReference) {
+      this.bitmapLoaderReference = bitmapLoaderReference;
+      return this;
   }
 
   /**
@@ -43,7 +56,7 @@ public class LoadRequest {
 
   void performLoad(Object model) {
     if (bitmapLoader == null) {
-      bitmapLoader = resolveBitmapLoader(cropView);
+      bitmapLoader = resolveBitmapLoader(cropView, bitmapLoaderReference);
     }
     bitmapLoader.load(model, cropView);
   }
