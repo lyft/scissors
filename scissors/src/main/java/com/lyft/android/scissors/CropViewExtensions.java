@@ -20,6 +20,11 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Rect;
 
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_GLIDE;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_INVALID;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_PICASSO;
+import static com.lyft.android.scissors.CropView.Extensions.LOADER_UIL;
+
 class CropViewExtensions {
 
     static void pickUsing(Activity activity, int requestCode) {
@@ -47,7 +52,18 @@ class CropViewExtensions {
     final static boolean HAS_GLIDE = canHasClass("com.bumptech.glide.Glide");
     final static boolean HAS_UIL = canHasClass("com.nostra13.universalimageloader.core.ImageLoader");
 
-    static BitmapLoader resolveBitmapLoader(CropView cropView) {
+    static BitmapLoader resolveBitmapLoader(CropView cropView, @CropView.Extensions.ExtensionBitmapLoader int bitmapLoaderReference) {
+        switch (bitmapLoaderReference) {
+            case LOADER_INVALID:
+                break;
+            case LOADER_PICASSO:
+                return PicassoBitmapLoader.createUsing(cropView);
+            case LOADER_GLIDE:
+                return GlideBitmapLoader.createUsing(cropView);
+            case LOADER_UIL:
+                return UILBitmapLoader.createUsing(cropView);
+        }
+
         if (HAS_PICASSO) {
             return PicassoBitmapLoader.createUsing(cropView);
         }

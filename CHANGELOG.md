@@ -1,10 +1,16 @@
 Change Log
 ==========
 
+Version 1.1.2 *(2017-03-28)*
+----------------------------
+- Add support for oval overlay
+
 Version 1.1.1 *(2016-07-21)*
+----------------------------
 - Fix #53, Image not centered wrt viewport
 
 Version 1.1.0 *(2016-04-15)*
+----------------------------
 
 - Add support for full overlay (#27 Thanks @rharter!)
 - Breaking changes attrs renamed: 
