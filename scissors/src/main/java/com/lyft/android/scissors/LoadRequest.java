@@ -11,7 +11,7 @@ public class LoadRequest {
 
     private final CropView cropView;
     private BitmapLoader bitmapLoader;
-    private LoaderType loaderType = LoaderType.UNKNOWN;
+    private LoaderType loaderType = LoaderType.CLASS_LOOKUP;
 
     LoadRequest(CropView cropView) {
         Utils.checkNotNull(cropView, "cropView == null");

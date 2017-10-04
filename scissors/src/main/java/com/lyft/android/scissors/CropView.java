@@ -421,7 +421,7 @@ public class CropView extends ImageView {
             PICASSO,
             GLIDE,
             UIL,
-            UNKNOWN
+            CLASS_LOOKUP
         }
 
         /**
@@ -433,7 +433,7 @@ public class CropView extends ImageView {
          * @see PicassoBitmapLoader
          * @see GlideBitmapLoader
          */
-        public LoadRequest using(LoaderType loaderType) {
+        public LoadRequest using(@NonNull LoaderType loaderType) {
             return new LoadRequest(cropView).using(loaderType);
         }
 

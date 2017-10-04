@@ -57,8 +57,10 @@ class CropViewExtensions {
                 return GlideBitmapLoader.createUsing(cropView);
             case UIL:
                 return UILBitmapLoader.createUsing(cropView);
-            default:
+            case CLASS_LOOKUP:
                 break;
+            default:
+                throw new IllegalStateException("Unsupported type of loader = " + loaderType);
         }
 
         if (HAS_PICASSO) {
