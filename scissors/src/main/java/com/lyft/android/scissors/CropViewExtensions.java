@@ -20,10 +20,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Rect;
 
-import static com.lyft.android.scissors.CropView.Extensions.LOADER_GLIDE;
-import static com.lyft.android.scissors.CropView.Extensions.LOADER_INVALID;
-import static com.lyft.android.scissors.CropView.Extensions.LOADER_PICASSO;
-import static com.lyft.android.scissors.CropView.Extensions.LOADER_UIL;
+import static com.lyft.android.scissors.CropView.Extensions.LoaderType;
 
 class CropViewExtensions {
 
@@ -52,16 +49,18 @@ class CropViewExtensions {
     final static boolean HAS_GLIDE = canHasClass("com.bumptech.glide.Glide");
     final static boolean HAS_UIL = canHasClass("com.nostra13.universalimageloader.core.ImageLoader");
 
-    static BitmapLoader resolveBitmapLoader(CropView cropView, @CropView.Extensions.ExtensionBitmapLoader int bitmapLoaderReference) {
-        switch (bitmapLoaderReference) {
-            case LOADER_INVALID:
-                break;
-            case LOADER_PICASSO:
+    static BitmapLoader resolveBitmapLoader(CropView cropView, LoaderType loaderType) {
+        switch (loaderType) {
+            case PICASSO:
                 return PicassoBitmapLoader.createUsing(cropView);
-            case LOADER_GLIDE:
+            case GLIDE:
                 return GlideBitmapLoader.createUsing(cropView);
-            case LOADER_UIL:
+            case UIL:
                 return UILBitmapLoader.createUsing(cropView);
+            case CLASS_LOOKUP:
+                break;
+            default:
+                throw new IllegalStateException("Unsupported type of loader = " + loaderType);
         }
 
         if (HAS_PICASSO) {
