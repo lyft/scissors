@@ -37,7 +37,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-
 import java.io.File;
 import java.io.OutputStream;
 import java.lang.annotation.Retention;
@@ -63,11 +62,13 @@ public class CropView extends ImageView {
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({ Shape.RECTANGLE, Shape.OVAL })
     public @interface Shape {
+
         int RECTANGLE = 0;
         int OVAL = 1;
     }
 
-    private @Shape int shape = Shape.RECTANGLE;
+    @Shape
+    private int shape = Shape.RECTANGLE;
     private Path ovalPath;
     private RectF ovalRect;
 
@@ -304,8 +305,8 @@ public class CropView extends ImageView {
     public boolean dispatchTouchEvent(MotionEvent event) {
         boolean result = super.dispatchTouchEvent(event);
 
-        if(!isEnabled()) {
-          return result;
+        if (!isEnabled()) {
+            return result;
         }
 
         touchManager.onEvent(event);
@@ -377,7 +378,6 @@ public class CropView extends ImageView {
 
     /**
      * Get the transform matrix
-     * @return
      */
     public Matrix getTransformMatrix() {
         return transform;
@@ -417,26 +417,24 @@ public class CropView extends ImageView {
             return new LoadRequest(cropView).using(bitmapLoader);
         }
 
-        @IntDef({LOADER_INVALID, LOADER_PICASSO, LOADER_GLIDE, LOADER_UIL})
-        @Retention(RetentionPolicy.CLASS)
-        @interface ExtensionBitmapLoader{}
+        public enum LoaderType {
+            PICASSO,
+            GLIDE,
+            UIL,
+            UNKNOWN
+        }
 
-        static final int LOADER_INVALID = -1;
-        public static final int LOADER_PICASSO = 0;
-        public static final int LOADER_GLIDE = 1;
-        public static final int LOADER_UIL = 2;
-
-      /**
-       * Load a {@link Bitmap} using a reference to a {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
-       *
-       * Please ensure that the library for the {@link BitmapLoader} you reference is available on the classpath.
-       *
-       * @param bitmapLoaderReference a reference to the {@link BitmapLoader} to use to load desired (@link Bitmap}
-       * @see PicassoBitmapLoader
-       * @see GlideBitmapLoader
-       */
-        public LoadRequest using(@ExtensionBitmapLoader int bitmapLoaderReference) {
-            return new LoadRequest(cropView).using(bitmapLoaderReference);
+        /**
+         * Load a {@link Bitmap} using a reference to a {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
+         *
+         * Please ensure that the library for the {@link BitmapLoader} you reference is available on the classpath.
+         *
+         * @param loaderType the {@link BitmapLoader} to use to load desired (@link Bitmap}
+         * @see PicassoBitmapLoader
+         * @see GlideBitmapLoader
+         */
+        public LoadRequest using(LoaderType loaderType) {
+            return new LoadRequest(cropView).using(loaderType);
         }
 
         /**
