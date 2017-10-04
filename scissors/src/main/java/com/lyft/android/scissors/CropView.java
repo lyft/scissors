@@ -24,21 +24,23 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-
-import com.lyft.android.scissors.CropViewExtensions.CropRequest;
-import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
-
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * An {@link ImageView} with a fixed viewport and cropping capabilities.
@@ -46,6 +48,7 @@ import java.io.OutputStream;
 public class CropView extends ImageView {
 
     private TouchManager touchManager;
+    private CropViewConfig config;
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
@@ -53,6 +56,20 @@ public class CropView extends ImageView {
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
     private Extensions extensions;
+
+    /** Corresponds to the values in {@link com.lyft.android.scissors.R.attr#cropviewShape} */
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({ Shape.RECTANGLE, Shape.OVAL })
+    public @interface Shape {
+
+        int RECTANGLE = 0;
+        int OVAL = 1;
+    }
+
+    @Shape
+    private int shape = Shape.RECTANGLE;
+    private Path ovalPath;
+    private RectF ovalRect;
 
     public CropView(Context context) {
         super(context);
@@ -66,12 +83,16 @@ public class CropView extends ImageView {
     }
 
     void initCropView(Context context, AttributeSet attrs) {
-        CropViewConfig config = CropViewConfig.from(context, attrs);
+        config = CropViewConfig.from(context, attrs);
 
         touchManager = new TouchManager(this, config);
 
         bitmapPaint.setFilterBitmap(true);
-        viewportPaint.setColor(config.getViewportOverlayColor());
+        setViewportOverlayColor(config.getViewportOverlayColor());
+        shape = config.shape();
+
+        // We need anti-aliased Paint to smooth the curved edges
+        viewportPaint.setFlags(viewportPaint.getFlags() | Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -83,7 +104,11 @@ public class CropView extends ImageView {
         }
 
         drawBitmap(canvas);
-        drawOverlay(canvas);
+        if (shape == Shape.RECTANGLE) {
+            drawSquareOverlay(canvas);
+        } else {
+            drawOvalOverlay(canvas);
+        }
     }
 
     private void drawBitmap(Canvas canvas) {
@@ -93,22 +118,102 @@ public class CropView extends ImageView {
         canvas.drawBitmap(bitmap, transform, bitmapPaint);
     }
 
-    private void drawOverlay(Canvas canvas) {
+    private void drawSquareOverlay(Canvas canvas) {
         final int viewportWidth = touchManager.getViewportWidth();
         final int viewportHeight = touchManager.getViewportHeight();
         final int left = (getWidth() - viewportWidth) / 2;
         final int top = (getHeight() - viewportHeight) / 2;
 
-        canvas.drawRect(0, top, left, getHeight() - top, viewportPaint);
-        canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
-        canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
-        canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+        canvas.drawRect(0, top, left, getHeight() - top, viewportPaint); // left
+        canvas.drawRect(0, 0, getWidth(), top, viewportPaint); // top
+        canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint); // right
+        canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint); // bottom
+    }
+
+    private void drawOvalOverlay(Canvas canvas) {
+        if (ovalRect == null) {
+            ovalRect = new RectF();
+        }
+        if (ovalPath == null) {
+            ovalPath = new Path();
+        }
+
+        final int viewportWidth = touchManager.getViewportWidth();
+        final int viewportHeight = touchManager.getViewportHeight();
+        final int left = (getWidth() - viewportWidth) / 2;
+        final int top = (getHeight() - viewportHeight) / 2;
+        final int right = getWidth() - left;
+        final int bottom = getHeight() - top;
+        ovalRect.left = left;
+        ovalRect.top = top;
+        ovalRect.right = right;
+        ovalRect.bottom = bottom;
+
+        // top left arc
+        ovalPath.reset();
+        ovalPath.moveTo(left, getHeight() / 2); // middle of the left side of the circle
+        ovalPath.arcTo(ovalRect, 180, 90, false); // draw arc to top
+        ovalPath.lineTo(left, top); // move to top-left corner
+        ovalPath.lineTo(left, getHeight() / 2); // move back to origin
+        ovalPath.close();
+        canvas.drawPath(ovalPath, viewportPaint);
+
+        // top right arc
+        ovalPath.reset();
+        ovalPath.moveTo(getWidth() / 2, top); // middle of the top side of the circle
+        ovalPath.arcTo(ovalRect, 270, 90, false); // draw arc to the right
+        ovalPath.lineTo(right, top); // move to top-right corner
+        ovalPath.lineTo(getWidth() / 2, top); // move back to origin
+        ovalPath.close();
+        canvas.drawPath(ovalPath, viewportPaint);
+
+        // bottom right arc
+        ovalPath.reset();
+        ovalPath.moveTo(right, getHeight() / 2); // middle of the right side of the circle
+        ovalPath.arcTo(ovalRect, 0, 90, false); // draw arc to the bottom
+        ovalPath.lineTo(right, bottom); // move to bottom-right corner
+        ovalPath.lineTo(right, getHeight() / 2); // move back to origin
+        ovalPath.close();
+        canvas.drawPath(ovalPath, viewportPaint);
+
+        // bottom left arc
+        ovalPath.reset();
+        ovalPath.moveTo(getWidth() / 2, bottom); // middle of the bottom side of the circle
+        ovalPath.arcTo(ovalRect, 90, 90, false); // draw arc to the left
+        ovalPath.lineTo(left, bottom); // move to bottom-left corner
+        ovalPath.lineTo(getWidth() / 2, bottom); // move back to origin
+        ovalPath.close();
+        canvas.drawPath(ovalPath, viewportPaint);
+
+        // Draw the square overlay as well
+        drawSquareOverlay(canvas);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         resetTouchManager();
+    }
+
+    /**
+     * Sets the color of the viewport overlay
+     *
+     * @param viewportOverlayColor The color to use for the viewport overlay
+     */
+    public void setViewportOverlayColor(@ColorInt int viewportOverlayColor) {
+        viewportPaint.setColor(viewportOverlayColor);
+        config.setViewportOverlayColor(viewportOverlayColor);
+    }
+
+    /**
+     * Sets the padding for the viewport overlay
+     *
+     * @param viewportOverlayPadding The new padding of the viewport overlay
+     */
+    public void setViewportOverlayPadding(int viewportOverlayPadding) {
+        config.setViewportOverlayPadding(viewportOverlayPadding);
+        resetTouchManager();
+        invalidate();
     }
 
     /**
@@ -197,7 +302,11 @@ public class CropView extends ImageView {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        super.dispatchTouchEvent(event);
+        boolean result = super.dispatchTouchEvent(event);
+
+        if (!isEnabled()) {
+            return result;
+        }
 
         touchManager.onEvent(event);
         invalidate();
@@ -267,6 +376,13 @@ public class CropView extends ImageView {
     }
 
     /**
+     * Get the transform matrix
+     */
+    public Matrix getTransformMatrix() {
+        return transform;
+    }
+
+    /**
      * Optional extensions to perform common actions involving a {@link CropView}
      */
     public static class Extensions {
@@ -298,6 +414,26 @@ public class CropView extends ImageView {
          */
         public LoadRequest using(@Nullable BitmapLoader bitmapLoader) {
             return new LoadRequest(cropView).using(bitmapLoader);
+        }
+
+        public enum LoaderType {
+            PICASSO,
+            GLIDE,
+            UIL,
+            CLASS_LOOKUP
+        }
+
+        /**
+         * Load a {@link Bitmap} using a reference to a {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
+         *
+         * Please ensure that the library for the {@link BitmapLoader} you reference is available on the classpath.
+         *
+         * @param loaderType the {@link BitmapLoader} to use to load desired (@link Bitmap}
+         * @see PicassoBitmapLoader
+         * @see GlideBitmapLoader
+         */
+        public LoadRequest using(@NonNull LoaderType loaderType) {
+            return new LoadRequest(cropView).using(loaderType);
         }
 
         /**
