@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    compile project(':scissors')
+    compile project(':scissors2')
     compile 'com.android.support:appcompat-v7:' + rootProject.ext.supportVersion
     compile 'com.android.support:design:' + rootProject.ext.supportVersion
     compile 'com.jakewharton:butterknife:7.0.1'

@@ -32,7 +32,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import com.lyft.android.scissors.CropView;
+import com.lyft.android.scissors2.CropView;
 import com.squareup.leakcanary.RefWatcher;
 import java.io.File;
 import java.util.List;
