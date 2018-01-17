@@ -24,6 +24,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,10 +74,8 @@ class Utils {
                     outputStream = new FileOutputStream(file);
                     bitmap.compress(format, quality, outputStream);
                     outputStream.flush();
-                } catch (final Throwable throwable) {
-                    if (BuildConfig.DEBUG) {
-                        Log.e(TAG, "Error attempting to save bitmap.", throwable);
-                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     closeQuietly(outputStream);
                 }
@@ -96,10 +95,8 @@ class Utils {
                 try {
                     bitmap.compress(format, quality, outputStream);
                     outputStream.flush();
-                } catch (final Throwable throwable) {
-                    if (BuildConfig.DEBUG) {
-                        Log.e(TAG, "Error attempting to save bitmap.", throwable);
-                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     if (closeWhenDone) {
                         closeQuietly(outputStream);
@@ -114,7 +111,7 @@ class Utils {
             if (outputStream != null) {
                 outputStream.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e(TAG, "Error attempting to close stream.", e);
         }
     }
