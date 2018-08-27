@@ -250,6 +250,16 @@ public class CropView extends ImageView {
         invalidate();
     }
 
+
+    public @Shape int getCropViewShape(){
+        return shape;
+    }
+
+    public void setCropViewShape(@Shape int shape) {
+        this.shape = shape;
+        invalidate();
+    }
+
     @Override
     public void setImageResource(@DrawableRes int resId) {
         final Bitmap bitmap = resId > 0
