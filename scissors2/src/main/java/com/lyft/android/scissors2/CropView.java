@@ -52,6 +52,7 @@ public class CropView extends ImageView {
 
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
+    private Paint borderPaint = new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
@@ -93,6 +94,9 @@ public class CropView extends ImageView {
 
         // We need anti-aliased Paint to smooth the curved edges
         viewportPaint.setFlags(viewportPaint.getFlags() | Paint.ANTI_ALIAS_FLAG);
+
+        borderPaint.setStrokeWidth(2);
+        borderPaint.setStyle(Paint.Style.STROKE);
     }
 
     @Override
@@ -105,7 +109,7 @@ public class CropView extends ImageView {
 
         drawBitmap(canvas);
         if (shape == Shape.RECTANGLE) {
-            drawSquareOverlay(canvas);
+            drawSquareOverlay(canvas, true);
         } else {
             drawOvalOverlay(canvas);
         }
@@ -118,7 +122,7 @@ public class CropView extends ImageView {
         canvas.drawBitmap(bitmap, transform, bitmapPaint);
     }
 
-    private void drawSquareOverlay(Canvas canvas) {
+    private void drawSquareOverlay(Canvas canvas, boolean withBorder) {
         final int viewportWidth = touchManager.getViewportWidth();
         final int viewportHeight = touchManager.getViewportHeight();
         final int left = (getWidth() - viewportWidth) / 2;
@@ -128,6 +132,10 @@ public class CropView extends ImageView {
         canvas.drawRect(0, 0, getWidth(), top, viewportPaint); // top
         canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint); // right
         canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint); // bottom
+
+        if (withBorder) {
+            canvas.drawRect(left + borderPaint.getStrokeWidth(), top, left + getWidth() - left, getHeight() - top, borderPaint);
+        }
     }
 
     private void drawOvalOverlay(Canvas canvas) {
@@ -186,7 +194,8 @@ public class CropView extends ImageView {
         canvas.drawPath(ovalPath, viewportPaint);
 
         // Draw the square overlay as well
-        drawSquareOverlay(canvas);
+        drawSquareOverlay(canvas, false);
+        canvas.drawOval(new RectF(left, top,right,bottom), borderPaint);
     }
 
     @Override
@@ -214,6 +223,14 @@ public class CropView extends ImageView {
         config.setViewportOverlayPadding(viewportOverlayPadding);
         resetTouchManager();
         invalidate();
+    }
+
+    public void setBorderStrokeWidth(float strokeWidth) {
+        borderPaint.setStrokeWidth(strokeWidth);
+    }
+
+    public void setBorderColor(int color) {
+        borderPaint.setColor(color);
     }
 
     /**
