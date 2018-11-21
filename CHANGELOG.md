@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 2.0.0 *(2018-11-20)*
+----------------------------
+- Add support for Picasso beyond version 2.5.2
+
 Version 1.1.2 *(2017-03-28)*
 ----------------------------
 - Add support for oval overlay
