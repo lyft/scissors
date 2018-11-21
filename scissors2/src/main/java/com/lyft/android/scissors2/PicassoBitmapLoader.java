@@ -15,14 +15,18 @@
  */
 package com.lyft.android.scissors2;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
+
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 import java.io.File;
+import java.lang.reflect.Method;
 
 /**
  * A {@link BitmapLoader} with transformation for {@link Picasso} image library.
@@ -57,17 +61,47 @@ public class PicassoBitmapLoader implements BitmapLoader {
         }
 
         requestCreator
-                .skipMemoryCache()
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .transform(transformation)
                 .into(imageView);
     }
 
     public static BitmapLoader createUsing(CropView cropView) {
-        return createUsing(cropView, Picasso.with(cropView.getContext()));
+        try {
+            Picasso picasso = obtainPicassoInstance(cropView.getContext());
+            return createUsing(cropView, picasso);
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't obtain picasso instance", e);
+        }
     }
 
     public static BitmapLoader createUsing(CropView cropView, Picasso picasso) {
         return new PicassoBitmapLoader(picasso,
                 PicassoFillViewportTransformation.createUsing(cropView.getViewportWidth(), cropView.getViewportHeight()));
     }
+
+    private static @NonNull Picasso obtainPicassoInstance(Context context) throws Exception {
+        Picasso picasso = obtainPicassoWithGetMethod(); // for Picasso version >= 2.71828
+        if (picasso == null) {
+            picasso = obtainPicassoWithWithMethod(context);
+        }
+        return picasso;
+    }
+
+    private static @Nullable Picasso obtainPicassoWithGetMethod() throws Exception {
+        Picasso picasso = null;
+        try {
+            Method method = Picasso.class.getMethod("get");
+            picasso = (Picasso) method.invoke(null);
+        } catch (NoSuchMethodException e) {
+            // expected, in case picasso version < 2.71828
+        }
+        return picasso;
+    }
+
+    private static @Nullable Picasso obtainPicassoWithWithMethod(Context context) throws Exception {
+        Method method = Picasso.class.getMethod("with", Context.class);
+        return (Picasso) method.invoke(null, context);
+    }
+
 }
