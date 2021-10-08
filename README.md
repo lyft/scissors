@@ -1,3 +1,5 @@
+⚠️ This repository has been archived and is no longer accepting contributions ⚠️
+
 <img src="art/scissors.png" width="256" align="right" hspace="20" />
 
 Scissors
